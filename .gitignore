@@ -9,3 +9,23 @@
 
 # ignore log files
 *.log
+
+# ignore fna files
+*.fna
+
+# ignore src
+*.src
+
+# ignore gz files
+*.gz
+
+*.err
+*.faa
+*.ffn
+*.fsa
+*.gbk
+*.gff
+*.sqn
+*.tbl
+*.tsv
+*.tsvz
