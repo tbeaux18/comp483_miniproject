@@ -1,0 +1,11 @@
+# ignore text files
+*.txt
+
+# ignore csv files
+*.csv
+
+# ignore .DS_Store
+*.DS_Store
+
+# ignore log files
+*.log
