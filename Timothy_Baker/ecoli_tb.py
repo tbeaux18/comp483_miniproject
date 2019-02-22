@@ -121,6 +121,7 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
 def build_prokka(fasta_list, output_dir_list, genome_name_list):
 
     for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
+
         prokka_command = ["prokka --outdir {} \
                             --prefix {}, {}, '--genus', \
                             'Escherichia".format(output_dir, genome_name, fasta_file)]
@@ -154,10 +155,10 @@ def main():
 
 
 
-    hm27_filename = cwd + 'HM27_fasta.fna'
-    hm46_filename = cwd + 'HM46_fasta.fna'
-    hm65_filename = cwd + 'HM65_fasta.fna'
-    hm69_filename = cwd + 'HM69_fasta.fna'
+    hm27_filename = cwd + '/HM27_fasta.fna'
+    hm46_filename = cwd + '/HM46_fasta.fna'
+    hm65_filename = cwd + '/HM65_fasta.fna'
+    hm69_filename = cwd + '/HM69_fasta.fna'
 
 
     # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
