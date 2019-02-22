@@ -167,10 +167,10 @@ def main():
 
 
 
-    hm27_filename = 'HM27_fasta.fna'
-    hm46_filename = 'HM46_fasta.fna'
-    hm65_filename = 'HM65_fasta.fna'
-    hm69_filename = 'HM69_fasta.fna'
+    hm27_filename = 'HM27_FASTA.fna'
+    hm46_filename = 'HM46_FASTA.fna'
+    hm65_filename = 'HM65_FASTA.fna'
+    hm69_filename = 'HM69_FASTA.fna'
 
 
     # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
@@ -199,7 +199,7 @@ def main():
 
     print("Beginning FASTQ Decompression")
     LOGGER.info("Beginning FASTQ Decompression")
-    sra_2_fq = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69']
+    sra_2_fq = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
     fastq_decomp(sra_2_fq)
 
     # need to include grabbing file path names
