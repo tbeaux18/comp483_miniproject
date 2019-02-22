@@ -149,10 +149,10 @@ def wget_gunzip_fasta(ftp_list, output_list):
         subprocess.run(gunzip_command)
 
 
-def just_wget(lst, outdir_lst):
+def sra_prefetch(lst):
 
-    for file, output_name in zip(lst, outdir_lst):
-        subprocess.run(['wget', '-O', output_name, file])
+    for file in lst:
+        subprocess.run(['prefetch', file])
 
 
 def main():
@@ -183,24 +183,29 @@ def main():
     # genome_names = ['hm27_anno', 'hm46_anno', 'hm65_anno', 'hm69_anno']
     ## build_prokka(filenames_list, output_dir_list, genome_names)
 
-    os.system("prokka --outdir prokka_hm27 --prefix hm27_anno hm27_filename '--genus' 'Escherichia")
-    os.system("prokka --outdir prokka_hm46 --prefix hm46_anno hm46_filename '--genus' 'Escherichia")
-    os.system("prokka --outdir prokka_hm65 --prefix hm65_anno hm65_filename '--genus' 'Escherichia")
-    os.system("prokka --outdir prokka_hm69 --prefix hm69_anno hm69_filename '--genus' 'Escherichia")
+    os.system("prokka --outdir prokka_hm27 --prefix hm27_anno {} --genus Escherichia".format(hm27_filename))
+    os.system("prokka --outdir prokka_hm46 --prefix hm46_anno {} --genus Escherichia".format(hm46_filename))
+    os.system("prokka --outdir prokka_hm65 --prefix hm65_anno {} --genus Escherichia".format(hm65_filename))
+    os.system("prokka --outdir prokka_hm69 --prefix hm69_anno {} --genus Escherichia".format(hm69_filename))
 
     # feature_ftp_list = [HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
     # feature_txt_output = ['hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
     #                         'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
     # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
     #
-    # sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
-    # sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
+    sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
+    sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
+    sra_prefetch(sra_files)
     # just_wget(sra_files, sra_dir)
 
-    print("Beginning FASTQ Decompression")
-    LOGGER.info("Beginning FASTQ Decompression")
-    sra_2_fq = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
-    fastq_decomp(sra_2_fq)
+    # print("Beginning FASTQ Decompression")
+    # LOGGER.info("Beginning FASTQ Decompression")
+    # sra_2_fq = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
+    #
+    # LOGGER.info("Decompressing {}".format(fq))
+    # fq_command = "fastq-dump -I --split-files {}".format(fq)
+    # subprocess.run(fq_command, shell=True)
+    # LOGGER.info("Finished {}".format(fq))
 
     # need to include grabbing file path names
     # think of how to store these records
