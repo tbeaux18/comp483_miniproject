@@ -113,7 +113,8 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
         log_file.write('There are {} bp in the {} assembly.\n'.format(\
                                                     num_of_bp, assembly_name))
 
-
+def handle_proka_output():
+    pass
 
 # def build_prokka(fasta_list, output_dir_list, genome_name_list):
 #
@@ -152,6 +153,15 @@ def sra_prefetch(lst):
 
     for file in lst:
         subprocess.run(['prefetch', file])
+
+
+
+def bwt2_build_index(ref_list, out_list):
+
+    for ref_file, base_name in zip(ref_list, out_list):
+        print("Building {} index".format(ref_file))
+        command = "bowtie2-build --threads 2 -f {} {}".format(ref_file, base_name)
+        subprocess.run(command, shell=True)
 
 
 def main():
@@ -193,16 +203,30 @@ def main():
     # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
     #
     # sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
-    sra_files = ['SRR1278956', 'SRR1278960', 'SRR1283106', 'SRR1278963']
+    # sra_files = ['SRR1278956', 'SRR1278960', 'SRR1283106', 'SRR1278963']
     # sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
     # sra_prefetch(sra_files)
 
     # print("Beginning FASTQ Decompression")
     # this moves to ~/ncbi/public/sra/ directory, fastq-dump needs this directory
     # otherwise it will redownload it if not found
-    LOGGER.info("Beginning FASTQ Decompression")
-    sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
-    fastq_decomp(sra_files, sra_2_fq)
+    # LOGGER.info("Beginning FASTQ Decompression")
+    # sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
+    # fastq_decomp(sra_files, sra_2_fq)
+
+    fasta_files = [hm27_filename, hm46_filename, hm65_filename, hm69_filename]
+    out_index_list = ['hm27_index', 'hm46_index', 'hm65_index', 'hm69_index']
+
+    bwt2_build_index(fasta_files, out_index_list)
+
+    # Begin bowtie index build
+    # need to move all files
+    # bowtie2-build file index_name
+    # once built, use the tophat to perform the alignments, but need to make sure
+    # all files are within the same index bwt directory
+    # need to use top hat, cuffdiff, and cuffnorm, figure out data structure, and get those alignments
+    # started
+
 
     # need to include grabbing file path names
     # think of how to store these records
