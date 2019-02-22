@@ -141,7 +141,10 @@ def wget_gunzip_fasta(ftp_list, output_list):
 
         subprocess.run(gunzip_command)
 
+def just_wget(lst, outdir_lst):
 
+    for file, output_name in zip(lst, outdir_lst):
+        subprocess.run(['wget', '-O', output_name, file])
 
 def main():
 
@@ -155,10 +158,10 @@ def main():
 
 
 
-    hm27_filename = cwd + '/HM27_fasta.fna'
-    hm46_filename = cwd + '/HM46_fasta.fna'
-    hm65_filename = cwd + '/HM65_fasta.fna'
-    hm69_filename = cwd + '/HM69_fasta.fna'
+    hm27_filename = 'HM27_fasta.fna'
+    hm46_filename = 'HM46_fasta.fna'
+    hm65_filename = 'HM65_fasta.fna'
+    hm69_filename = 'HM69_fasta.fna'
 
 
     # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
@@ -177,8 +180,9 @@ def main():
                             'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
     wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
 
-
-
+    sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
+    sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69']
+    just_wget(sra_files, sra_dir)
 
     # need to include grabbing file path names
     # think of how to store these records
