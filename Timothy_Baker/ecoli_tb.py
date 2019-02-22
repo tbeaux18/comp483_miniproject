@@ -118,12 +118,14 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
 
 
 
-def build_prokka(fasta_file, output_dir, genome_name):
+def build_prokka(fasta_list, output_dir_list, genome_name_list):
 
-    prokka_command = ['prokka', '--outdir', output_dir, \
-    '--prefix', genome_name, fasta_file, '--genus', 'Escherichia']
+    for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
+        prokka_command = ["prokka --outdir {} \
+                            --prefix {}, {}, '--genus', \
+                            'Escherichia".format(output_dir, genome_name, fasta_file)]
 
-    subprocess.run(prokka_command)
+        subprocess.run(prokka_command, shell=True)
 
 
 
@@ -149,8 +151,6 @@ def main():
     # grab first the working directory so you can properly manage where
     # each of the files go
     cwd = os.getcwd()
-
-
 
 
 
