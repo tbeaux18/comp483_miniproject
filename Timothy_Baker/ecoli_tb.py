@@ -122,11 +122,18 @@ def build_prokka(fasta_list, output_dir_list, genome_name_list):
 
     for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
 
-        prokka_command = ["prokka --outdir {} \
-                            --prefix {}, {}, '--genus', \
-                            'Escherichia".format(output_dir, genome_name, fasta_file)]
+        prokka_command = "prokka --outdir %s --prefix %s, %s, '--genus', 'Escherichia" % (output_dir, genome_name, fasta_file)
 
         subprocess.run(prokka_command, shell=True)
+
+
+def fastq_decomp(lst_sra):
+
+    for fq in lst_sra:
+
+        fq_command = "fastq-dump -I --split-files %s" % fq
+
+        subprocess.run(fq_command, shell=True)
 
 
 
@@ -141,10 +148,12 @@ def wget_gunzip_fasta(ftp_list, output_list):
 
         subprocess.run(gunzip_command)
 
+
 def just_wget(lst, outdir_lst):
 
     for file, output_name in zip(lst, outdir_lst):
         subprocess.run(['wget', '-O', output_name, file])
+
 
 def main():
 
@@ -181,8 +190,13 @@ def main():
     wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
 
     sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
-    sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69']
+    sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
     just_wget(sra_files, sra_dir)
+
+    sra_2_fq = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69']
+
+    fastq_decomp(sra_2_fq)
+
 
     # need to include grabbing file path names
     # think of how to store these records
