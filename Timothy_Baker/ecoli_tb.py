@@ -84,6 +84,7 @@ HM69_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387
             'ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278963/SRR1278963.sra')
 
 
+
 LOGGER = logging.getLogger(__name__)
 
 LOGGER.setLevel(logging.INFO)
@@ -183,17 +184,18 @@ def main():
     # genome_names = ['hm27_anno', 'hm46_anno', 'hm65_anno', 'hm69_anno']
     ## build_prokka(filenames_list, output_dir_list, genome_names)
 
-    os.system("prokka --outdir prokka_hm27 --prefix hm27_anno {} --genus Escherichia".format(hm27_filename))
-    os.system("prokka --outdir prokka_hm46 --prefix hm46_anno {} --genus Escherichia".format(hm46_filename))
-    os.system("prokka --outdir prokka_hm65 --prefix hm65_anno {} --genus Escherichia".format(hm65_filename))
-    os.system("prokka --outdir prokka_hm69 --prefix hm69_anno {} --genus Escherichia".format(hm69_filename))
+    # os.system("prokka --outdir prokka_hm27 --prefix hm27_anno {} --genus Escherichia".format(hm27_filename))
+    # os.system("prokka --outdir prokka_hm46 --prefix hm46_anno {} --genus Escherichia".format(hm46_filename))
+    # os.system("prokka --outdir prokka_hm65 --prefix hm65_anno {} --genus Escherichia".format(hm65_filename))
+    # os.system("prokka --outdir prokka_hm69 --prefix hm69_anno {} --genus Escherichia".format(hm69_filename))
 
     # feature_ftp_list = [HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
     # feature_txt_output = ['hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
     #                         'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
     # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
     #
-    sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
+    # sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
+    sra_files = ['SRR1278963', 'SRR1278960', 'SRR1283106', 'SRR1278963']
     sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
     sra_prefetch(sra_files)
     # just_wget(sra_files, sra_dir)
