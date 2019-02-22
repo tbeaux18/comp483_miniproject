@@ -178,6 +178,13 @@ def main():
     wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
 
 
+<<<<<<< HEAD
+    fasta_ftp_list = [HM27_FASTA, HM46_FASTA, HM65_FASTA, HM69_FASTA]
+    fasta_output_name = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
+                            'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz']
+    wget_gunzip_fasta(fasta_ftp_list, fasta_output_name)
+=======
+>>>>>>> f97f6b768b875f29c1e145b4ef3de3e47f0fdd4d
 
 
     # need to include grabbing file path names
