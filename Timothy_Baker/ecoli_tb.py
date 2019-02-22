@@ -122,7 +122,7 @@ def build_prokka(fasta_list, output_dir_list, genome_name_list):
 
     for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
 
-        prokka_command = "prokka --outdir %s --prefix %s, %s, '--genus', 'Escherichia" % (output_dir, genome_name, fasta_file)
+        prokka_command = "prokka --outdir {} --prefix {} {} '--genus' 'Escherichia".format(output_dir, genome_name, fasta_file)
 
         subprocess.run(prokka_command, shell=True)
 
@@ -131,7 +131,7 @@ def fastq_decomp(lst_sra):
 
     for fq in lst_sra:
 
-        fq_command = "fastq-dump -I --split-files %s" % fq
+        fq_command = "fastq-dump -I --split-files {}".format(fq)
 
         subprocess.run(fq_command, shell=True)
 
