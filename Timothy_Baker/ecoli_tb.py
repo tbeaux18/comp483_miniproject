@@ -130,7 +130,9 @@ def fastq_decomp(lst_sra, name_lst):
 
         LOGGER.info("Decompressing {}".format(fq))
         fq_command = "fastq-dump -I --split-files {} -O {}".format(fq, nm)
+        print("processing {}".format(fq))
         subprocess.run(fq_command, shell=True)
+        print("finished {}".format(fq))
         LOGGER.info("Finished {}".format(fq))
 
 
@@ -196,7 +198,9 @@ def main():
     # sra_prefetch(sra_files)
 
     # print("Beginning FASTQ Decompression")
-    # LOGGER.info("Beginning FASTQ Decompression")
+    # this moves to ~/ncbi/public/sra/ directory, fastq-dump needs this directory
+    # otherwise it will redownload it if not found
+    LOGGER.info("Beginning FASTQ Decompression")
     sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
     fastq_decomp(sra_files, sra_2_fq)
 
