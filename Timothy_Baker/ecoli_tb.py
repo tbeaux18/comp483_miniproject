@@ -68,20 +68,16 @@ from Bio import SeqIO
 
 # FTP FILES NEEDED FOR ANALYSIS, TUPLE FORMAT, (FASTA FTP LINK, FEATURE COUNT FTP LINK, SRA FTP LINK)
 HM27_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_genomic.fna.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_feature_count.txt.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278963/SRR1278963.sra')
+            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_feature_count.txt.gz')
 
 HM46_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/845/GCF_000387845.2_ASM38784v2/GCF_000387845.2_ASM38784v2_genomic.fna.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/845/GCF_000387845.2_ASM38784v2/GCF_000387845.2_ASM38784v2_feature_count.txt.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278960/SRR1278960.sra')
+            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/845/GCF_000387845.2_ASM38784v2/GCF_000387845.2_ASM38784v2_feature_count.txt.gz')
 
 HM65_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/785/GCF_000387785.2_ASM38778v2/GCF_000387785.2_ASM38778v2_genomic.fna.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/785/GCF_000387785.2_ASM38778v2/GCF_000387785.2_ASM38778v2_feature_count.txt.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR128/SRR1283106/SRR1283106.sra')
+            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/785/GCF_000387785.2_ASM38778v2/GCF_000387785.2_ASM38778v2_feature_count.txt.gz')
 
 HM69_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387865.2_ASM38786v2/GCF_000387865.2_ASM38786v2_genomic.fna.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387865.2_ASM38786v2/GCF_000387865.2_ASM38786v2_feature_count.txt.gz', \
-            'ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278963/SRR1278963.sra')
+            'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387865.2_ASM38786v2/GCF_000387865.2_ASM38786v2_feature_count.txt.gz')
 
 
 
@@ -128,12 +124,12 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
         # subprocess.run(prokka_command, shell=True)
 
 
-def fastq_decomp(lst_sra):
+def fastq_decomp(lst_sra, name_lst):
 
-    for fq in lst_sra:
+    for fq, nm in zip(lst_sra, name_lst):
 
         LOGGER.info("Decompressing {}".format(fq))
-        fq_command = "fastq-dump -I --split-files {}".format(fq)
+        fq_command = "fastq-dump -I --split-files {} -O {}".format(fq, nm)
         subprocess.run(fq_command, shell=True)
         LOGGER.info("Finished {}".format(fq))
 
@@ -195,34 +191,29 @@ def main():
     # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
     #
     # sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
-    sra_files = ['SRR1278963', 'SRR1278960', 'SRR1283106', 'SRR1278963']
-    sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
-    sra_prefetch(sra_files)
-    # just_wget(sra_files, sra_dir)
+    sra_files = ['SRR1278956', 'SRR1278960', 'SRR1283106', 'SRR1278963']
+    # sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
+    # sra_prefetch(sra_files)
 
     # print("Beginning FASTQ Decompression")
     # LOGGER.info("Beginning FASTQ Decompression")
-    # sra_2_fq = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
-    #
-    # LOGGER.info("Decompressing {}".format(fq))
-    # fq_command = "fastq-dump -I --split-files {}".format(fq)
-    # subprocess.run(fq_command, shell=True)
-    # LOGGER.info("Finished {}".format(fq))
+    sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
+    fastq_decomp(sra_files, sra_2_fq)
 
     # need to include grabbing file path names
     # think of how to store these records
-    hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
-    hm46_records = list(SeqIO.parse("HM46_FASTA.fna", "fasta"))
-    hm65_records = list(SeqIO.parse("HM65_FASTA.fna", "fasta"))
-    hm69_records = list(SeqIO.parse("HM69_FASTA.fna", "fasta"))
-
-
-    # Store all FASTA records in a list for quick retrieval and looping
-    fasta_record_list = [hm27_records, hm46_records, hm65_records, hm69_records]
-    fasta_record_output = ['HM27', 'HM46', 'HM65', 'HM69']
-    parse_seqio_fasta(fasta_record_list, fasta_record_output, log_file)
-
-
+    # hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
+    # hm46_records = list(SeqIO.parse("HM46_FASTA.fna", "fasta"))
+    # hm65_records = list(SeqIO.parse("HM65_FASTA.fna", "fasta"))
+    # hm69_records = list(SeqIO.parse("HM69_FASTA.fna", "fasta"))
+    #
+    #
+    # # Store all FASTA records in a list for quick retrieval and looping
+    # fasta_record_list = [hm27_records, hm46_records, hm65_records, hm69_records]
+    # fasta_record_output = ['HM27', 'HM46', 'HM65', 'HM69']
+    # parse_seqio_fasta(fasta_record_list, fasta_record_output, log_file)
+    #
+    #
 
 
     log_file.close()
