@@ -119,7 +119,7 @@ def main():
     fasta_ftp_list = [HM27_FASTA, HM46_FASTA, HM65_FASTA, HM69_FASTA]
     fasta_output_name = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
                             'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz']
-    wget_gunzip_fasta(fasta_ftp_list, fasta_output_name)
+   #  wget_gunzip_fasta(fasta_ftp_list, fasta_output_name)
 
     # build prokka commands
     # prokka --outdir mydir --prefix mygenome contigs.fa --genus 'Escherichia'
