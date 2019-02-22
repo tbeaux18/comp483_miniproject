@@ -149,7 +149,6 @@ def main():
     # grab first the working directory so you can properly manage where
     # each of the files go
     cwd = os.getcwd()
-    subprocess.run(['cd', cwd])
 
 
 
