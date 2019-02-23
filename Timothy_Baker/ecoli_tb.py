@@ -191,7 +191,7 @@ def run_cuffmerge(assembly_file):
 
 def run_cuffdiff(merged_gtf, bam1, bam2, bam3):
 
-    command = "cuffdiff -o diff_results -p 4 {} {}, {}, {}".format(merged_gtf, bam1, bam2, bam3)
+    command = "cuffdiff -o diff_results -p 4 {} {} \ {} \ {}".format(merged_gtf, bam1, bam2, bam3)
 
     subprocess.run(command, shell=True)
 
@@ -204,7 +204,6 @@ def main():
     # grab first the working directory so you can properly manage where
     # each of the files go
     cwd = os.getcwd()
-
 
 
     hm27_filename = 'HM27_FASTA.fna'
@@ -295,26 +294,26 @@ def main():
 
 
 
-    hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
+    # hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
+    # #
+    # run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
+    # #
+    # hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
+    # #
+    # run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
+    # #
+    # hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
+    # #
+    # run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
+    # #
+    # # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
+    # #
+    # # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
     #
-    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
-    #
-    hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
-    #
-    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
-    #
-    hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
-    #
-    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
-    #
-    # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
-    #
-    # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
-
-    with open('ecoli_assemblies.txt', 'w') as assemble:
-        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
-    # ./hm69_cuff/transcripts.gtf\n
-    run_cuffmerge('ecoli_assemblies.txt')
+    # with open('ecoli_assemblies.txt', 'w') as assemble:
+    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
+    # # ./hm69_cuff/transcripts.gtf\n
+    # run_cuffmerge('ecoli_assemblies.txt')
 
 
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
