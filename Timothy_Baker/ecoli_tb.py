@@ -195,6 +195,14 @@ def run_cuffdiff(merged_gtf, bam1, bam2, bam3):
 
     subprocess.run(command, shell=True)
 
+def samtools_sort(bam_file, output_name):
+
+    for bmf, out in zip(bam_file, output_name):
+        command = "samtools sort {} -o {}".format(bmf, out)
+        subprocess.run(command, shell=True)
+
+
+
 def main():
 
     log_file = open('UPEC.log', 'w')
@@ -291,33 +299,45 @@ def main():
     # hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
     # build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
 
-
-
-
     hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
-    # #
-    # run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
-    # #
     hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
-    # #
-    # run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
-    # #
     hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
+    hm27_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
+    hm46_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
+    hm65_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
+
+    bam_list = [hm27_bam, hm46_bam, hm65_bam]
+    output_sorted_list = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam]
+    print("Sorting BAMS")
+    samtools_sort(bam_list, output_sorted_list)
+
+
     # #
-    # run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
+    print("Running cufflinks")
+    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_sorted_bam)
+    # #
+
+    # #
+    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_sorted_bam)
+    # #
+
+    # #
+    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_sorted_bam)
     # #
     # # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
     # #
     # # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
     #
-    # with open('ecoli_assemblies.txt', 'w') as assemble:
-    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
-    # # ./hm69_cuff/transcripts.gtf\n
-    # run_cuffmerge('ecoli_assemblies.txt')
+    with open('ecoli_assemblies.txt', 'w') as assemble:
+        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
+    # ./hm69_cuff/transcripts.gtf\n
+
+    print("Running cuffmerge")
+    run_cuffmerge('ecoli_assemblies.txt')
 
 
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
-    run_cuffdiff(merged_gtf, hm27_bam, hm46_bam, hm65_bam)
+    run_cuffdiff(merged_gtf, hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam)
 
 
     # need to include grabbing file path names
