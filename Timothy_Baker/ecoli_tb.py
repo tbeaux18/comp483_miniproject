@@ -241,14 +241,14 @@ def main():
 
     hm27_base_name = 'hm27_index'
     hm27_outdir_name = 'hm27_tophat'
-    hm27_gff_file = cwd + '/prokka_hm27/hm27_anno.gff'
+    hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
     hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
     hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
     build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
 
     hm46_base_name = 'hm46_index'
     hm46_outdir_name = 'hm46_tophat'
-    hm46_gff_file = cwd + '/prokka_hm46/hm46_anno.gff'
+    hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
     hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
     hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
     build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
@@ -256,14 +256,14 @@ def main():
 
     hm65_base_name = 'hm65_index'
     hm65_outdir_name = 'hm65_tophat'
-    hm65_gff_file = cwd + '/prokka_hm65/hm65_anno.gff'
+    hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
     hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
     hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
     build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
 
     hm69_base_name = 'hm69_index'
     hm69_outdir_name = 'hm69_tophat'
-    hm69_gff_file = cwd + '/prokka_hm69/hm69_anno.gff'
+    hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
     hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
     hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
     build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
