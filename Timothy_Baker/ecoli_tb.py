@@ -169,7 +169,7 @@ def bwt2_build_index(ref_list, out_list):
 
 def build_tophat_alignment(out_dir_name, gff_file, idx_base_name, fastq_1, fastq_2):
 
-    trans_command = "tophay -G {} --transcriptome-index={} {}".format(gff_file, \
+    trans_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
                                                         idx_base_name, \
                                                         idx_base_name)
     command = "tophat2 -p 4 -o {} {} {} {}".format(out_dir_name, idx_base_name, fastq_1, fastq_2)
