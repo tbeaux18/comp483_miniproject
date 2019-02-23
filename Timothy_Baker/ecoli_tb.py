@@ -307,18 +307,20 @@ def main():
     #
     # run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
     #
-    hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
+    # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
     #
     # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
 
-    # with open('ecoli_assemblies.txt', 'w') as assemble:
-    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n./hm69_cuff/transcripts.gtf\n")
-    #
-    # run_cuffmerge('ecoli_assemblies.txt')
+    with open('ecoli_assemblies.txt', 'w') as assemble:
+        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
+    # ./hm69_cuff/transcripts.gtf\n
+    run_cuffmerge('ecoli_assemblies.txt')
 
 
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
     run_cuffdiff(merged_gtf, hm27_bam, hm46_bam, hm65_bam)
+
+
     # need to include grabbing file path names
     # think of how to store these records
     # hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
