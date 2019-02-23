@@ -115,17 +115,16 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
 
 # def handle_proka_output():
 #
-#
 #     with open(path_to_txt, 'r') as prokka_output:
-
-
-# def build_prokka(fasta_list, output_dir_list, genome_name_list):
 #
-#     for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
-#
-#         os.system("prokka --outdir {} --prefix {} {} '--genus' 'Escherichia".format(output_dir, genome_name, fasta_file))
 
-        # subprocess.run(prokka_command, shell=True)
+def build_prokka(fasta_list, output_dir_list, genome_name_list):
+
+    for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
+
+        prokka_command = "prokka --outdir {} --prefix {} {} --genus Escherichia".format(output_dir, genome_name, fasta_file)
+
+        subprocess.run(prokka_command, shell=True)
 
 
 def fastq_decomp(lst_sra, name_lst):
@@ -184,6 +183,11 @@ def run_cufflinks(gff_file, output_dir, bam_file):
     subprocess.run(command, shell=True)
 
 
+def run_cuffmerge(assembly_file):
+
+    command = "cuffmerge -p 4 -o {} {}".format('merged_ecoli', assembly_file)
+
+    subprocess.run(command, shell=True)
 
 def main():
 
@@ -255,14 +259,14 @@ def main():
 
     # hm27_base_name = 'hm27_index'
     # hm27_outdir_name = 'hm27_tophat'
-    hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
+    # hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
     # hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
     # hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
     # build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
     #
     # hm46_base_name = 'hm46_index'
     # hm46_outdir_name = 'hm46_tophat'
-    hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
+    # hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
     # hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
     # hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
     # build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
@@ -270,14 +274,14 @@ def main():
     #
     # hm65_base_name = 'hm65_index'
     # hm65_outdir_name = 'hm65_tophat'
-    hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
+    # hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
     # hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
     # hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
     # build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
     #
     # hm69_base_name = 'hm69_index'
     # hm69_outdir_name = 'hm69_tophat'
-    hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
+    # hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
     # hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
     # hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
     # build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
@@ -286,26 +290,27 @@ def main():
 
 
     hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
-
-    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
-
+    #
+    # run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
+    #
     hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
-
-    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
-
+    #
+    # run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
+    #
     hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
-
-    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
-
+    #
+    # run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
+    #
     hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
+    #
+    # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
 
-    run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
+    with open('ecoli_assemblies.txt', 'w') as assemble:
+        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n./hm69_cuff/transcripts.gtf\n")
 
+    run_cuffmerge('ecoli_assemblies.txt')
 
-
-
-
-
+    # bam_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
 
     # need to include grabbing file path names
     # think of how to store these records
