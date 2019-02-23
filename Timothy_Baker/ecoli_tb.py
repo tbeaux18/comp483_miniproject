@@ -113,8 +113,11 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
         log_file.write('There are {} bp in the {} assembly.\n'.format(\
                                                     num_of_bp, assembly_name))
 
-def handle_proka_output():
-    pass
+# def handle_proka_output():
+#
+#
+#     with open(path_to_txt, 'r') as prokka_output:
+
 
 # def build_prokka(fasta_list, output_dir_list, genome_name_list):
 #
@@ -166,7 +169,7 @@ def bwt2_build_index(ref_list, out_list):
 
 def build_tophat_alignment(out_dir_name, gff_file, idx_base_name, fastq_1, fastq_2):
 
-    command = "tophat -p 4 -G {} -o {} --no-novel-juncs {} {} {}".format(gff_file, \
+    command = "tophat2 -p 4 -G {} -o {} --no-novel-juncs {} {} {}".format(gff_file, \
                                                         out_dir_name, \
                                                         idx_base_name, \
                                                         fastq_1, fastq_2)
@@ -182,7 +185,9 @@ def main():
     # grab first the working directory so you can properly manage where
     # each of the files go
     cwd = os.getcwd()
-    print(cwd)
+
+
+
 
 
     hm27_filename = 'HM27_FASTA.fna'
@@ -238,6 +243,8 @@ def main():
 
     # need to configure to grab fastq files from specific directories and
     # store those paths as simple variables to pass through.
+    # may need to change .gff name to the same base name, much of top hats functionality
+    # is not kept up
 
     hm27_base_name = 'hm27_index'
     hm27_outdir_name = 'hm27_tophat'
@@ -282,8 +289,9 @@ def main():
     # fasta_record_output = ['HM27', 'HM46', 'HM65', 'HM69']
     # parse_seqio_fasta(fasta_record_list, fasta_record_output, log_file)
     #
+    # log_file.write("\nHM27 Prokka Annotation\n")
+    # subprocess.run("cat hm27-prokka-output.txt >> UPEC.log", shell=True)
     #
-
 
     log_file.close()
 
