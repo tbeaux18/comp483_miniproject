@@ -191,7 +191,7 @@ def run_cuffmerge(assembly_file):
 
 def run_cuffdiff(merged_gtf, bam1, bam2, bam3):
 
-    command = "cuffdiff -o diff_results -p 4 {} \ {} \ {} \ {}".format(merged_gtf, bam1, bam2, bam3)
+    command = "cuffdiff -o diff_results -p 4 -L HM27,HM46,HM65 {} {} {} {}".format(merged_gtf, bam1, bam2, bam3)
 
     subprocess.run(command, shell=True)
 
@@ -315,9 +315,6 @@ def main():
     # # ./hm69_cuff/transcripts.gtf\n
     # run_cuffmerge('ecoli_assemblies.txt')
 
-    hm27_bam = './hm27_tophat/accepted_hits.bam'
-    hm46_bam = './hm46_tophat/accepted_hits.bam'
-    hm65_bam = './hm65_tophat/accepted_hits.bam'
 
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
     run_cuffdiff(merged_gtf, hm27_bam, hm46_bam, hm65_bam)
