@@ -189,9 +189,9 @@ def run_cuffmerge(assembly_file):
 
     subprocess.run(command, shell=True)
 
-def run_cuffdiff(merged_gtf, bam_list):
+def run_cuffdiff(merged_gtf, bam1, bam2, bam3, bam4):
 
-    command = "cuffdiff -o diff_results -p 4 {} {}".format(merged_gtf, bam_list)
+    command = "cuffdiff -o diff_results -p 4 {} {}, {}, {}, {}".format(merged_gtf, bam1, bam2, bam3, bam4)
 
     subprocess.run(command, shell=True)
 
@@ -318,8 +318,7 @@ def main():
 
 
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
-    bam_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
-    run_cuffdiff(merged_gtf, bam_list)
+    run_cuffdiff(merged_gtf, hm27_bam, hm46_bam, hm65_bam, hm69_bam)
     # need to include grabbing file path names
     # think of how to store these records
     # hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
