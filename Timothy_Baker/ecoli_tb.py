@@ -189,6 +189,12 @@ def run_cuffmerge(assembly_file):
 
     subprocess.run(command, shell=True)
 
+def run_cuffdiff(merged_gtf, bam_list):
+
+    command = "cuffdiff -o diff_results -p 4 {} {}".format(merged_gtf, bam_list)
+
+    subprocess.run(command, shell=True)
+
 def main():
 
     log_file = open('UPEC.log', 'w')
@@ -305,13 +311,15 @@ def main():
     #
     # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
 
-    with open('ecoli_assemblies.txt', 'w') as assemble:
-        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n./hm69_cuff/transcripts.gtf\n")
+    # with open('ecoli_assemblies.txt', 'w') as assemble:
+    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n./hm69_cuff/transcripts.gtf\n")
+    #
+    # run_cuffmerge('ecoli_assemblies.txt')
 
-    run_cuffmerge('ecoli_assemblies.txt')
 
-    # bam_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
-
+    merged_gtf = cwd + '/merged_ecoli/merged.gtf'
+    bam_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
+    run_cuffdiff(merged_gtf, bam_list)
     # need to include grabbing file path names
     # think of how to store these records
     # hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
