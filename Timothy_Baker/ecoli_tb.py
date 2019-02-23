@@ -265,14 +265,14 @@ def main():
 
     # hm27_base_name = 'hm27_index'
     # hm27_outdir_name = 'hm27_tophat'
-    # hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
+    hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
     # hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
     # hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
     # build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
     #
     # hm46_base_name = 'hm46_index'
     # hm46_outdir_name = 'hm46_tophat'
-    # hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
+    hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
     # hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
     # hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
     # build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
@@ -280,7 +280,7 @@ def main():
     #
     # hm65_base_name = 'hm65_index'
     # hm65_outdir_name = 'hm65_tophat'
-    # hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
+    hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
     # hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
     # hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
     # build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
@@ -297,15 +297,15 @@ def main():
 
     hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
     #
-    # run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
+    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
     #
     hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
     #
-    # run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
+    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
     #
     hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
     #
-    # run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
+    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
     #
     # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
     #
@@ -328,7 +328,7 @@ def main():
     # hm65_records = list(SeqIO.parse("HM65_FASTA.fna", "fasta"))
     # hm69_records = list(SeqIO.parse("HM69_FASTA.fna", "fasta"))
     #
-    #
+    # #
     # # Store all FASTA records in a list for quick retrieval and looping
     # fasta_record_list = [hm27_records, hm46_records, hm65_records, hm69_records]
     # fasta_record_output = ['HM27', 'HM46', 'HM65', 'HM69']
@@ -336,7 +336,7 @@ def main():
     #
     # log_file.write("\nHM27 Prokka Annotation\n")
     # subprocess.run("cat hm27-prokka-output.txt >> UPEC.log", shell=True)
-    #
+
 
     log_file.close()
 
