@@ -178,6 +178,13 @@ def build_tophat_alignment(out_dir_name, gff_file, idx_base_name, fastq_1, fastq
     subprocess.run(command, shell=True)
 
 
+def run_cufflinks(gff_file, output_dir, bam_file):
+
+    command = "cufflinks -p 4 -G {} -o {} {}".format(gff_file, output_dir, bam_file)
+    subprocess.run(command, shell=True)
+
+
+
 def main():
 
     log_file = open('UPEC.log', 'w')
@@ -187,8 +194,6 @@ def main():
     # grab first the working directory so you can properly manage where
     # each of the files go
     cwd = os.getcwd()
-
-
 
 
 
@@ -248,34 +253,58 @@ def main():
     # may need to change .gff name to the same base name, much of top hats functionality
     # is not kept up
 
-    hm27_base_name = 'hm27_index'
-    hm27_outdir_name = 'hm27_tophat'
+    # hm27_base_name = 'hm27_index'
+    # hm27_outdir_name = 'hm27_tophat'
     hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
-    hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
-    hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
-    build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
-
-    hm46_base_name = 'hm46_index'
-    hm46_outdir_name = 'hm46_tophat'
+    # hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
+    # hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
+    # build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
+    #
+    # hm46_base_name = 'hm46_index'
+    # hm46_outdir_name = 'hm46_tophat'
     hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
-    hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
-    hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
-    build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
-
-
-    hm65_base_name = 'hm65_index'
-    hm65_outdir_name = 'hm65_tophat'
+    # hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
+    # hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
+    # build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
+    #
+    #
+    # hm65_base_name = 'hm65_index'
+    # hm65_outdir_name = 'hm65_tophat'
     hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
-    hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
-    hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
-    build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
-
-    hm69_base_name = 'hm69_index'
-    hm69_outdir_name = 'hm69_tophat'
+    # hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
+    # hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
+    # build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
+    #
+    # hm69_base_name = 'hm69_index'
+    # hm69_outdir_name = 'hm69_tophat'
     hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
-    hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
-    hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
-    build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
+    # hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
+    # hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
+    # build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
+
+
+
+
+    hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
+
+    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_bam)
+
+    hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
+
+    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_bam)
+
+    hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
+
+    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_bam)
+
+    hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
+
+    run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
+
+
+
+
+
 
 
     # need to include grabbing file path names
