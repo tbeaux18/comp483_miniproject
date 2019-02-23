@@ -164,6 +164,15 @@ def bwt2_build_index(ref_list, out_list):
         subprocess.run(command, shell=True)
 
 
+def build_tophat_alignment(out_dir_name, gff_file, idx_base_name, fastq_1, fastq_2):
+
+    command = "tophat -p 4 -G {} -o {} --no-novel-juncs {} {} {}".format(gff_file, \
+                                                        out_dir_name, \
+                                                        idx_base_name, \
+                                                        fastq_1, fastq_2)
+    print("Aligning {}".format(idx_base_name))
+    subprocess.run(command, shell=True)
+
 def main():
 
     log_file = open('UPEC.log', 'w')
@@ -173,7 +182,7 @@ def main():
     # grab first the working directory so you can properly manage where
     # each of the files go
     cwd = os.getcwd()
-
+    print(cwd)
 
 
     hm27_filename = 'HM27_FASTA.fna'
@@ -214,10 +223,9 @@ def main():
     # sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
     # fastq_decomp(sra_files, sra_2_fq)
 
-    fasta_files = [hm27_filename, hm46_filename, hm65_filename, hm69_filename]
-    out_index_list = ['hm27_index', 'hm46_index', 'hm65_index', 'hm69_index']
-
-    bwt2_build_index(fasta_files, out_index_list)
+    # fasta_files = [hm27_filename, hm46_filename, hm65_filename, hm69_filename]
+    # out_index_list = ['hm27_index', 'hm46_index', 'hm65_index', 'hm69_index']
+    # bwt2_build_index(fasta_files, out_index_list)
 
     # Begin bowtie index build
     # need to move all files
@@ -225,7 +233,40 @@ def main():
     # once built, use the tophat to perform the alignments, but need to make sure
     # all files are within the same index bwt directory
     # need to use top hat, cuffdiff, and cuffnorm, figure out data structure, and get those alignments
-    # started
+    # need to add copy commmand to make the fasta files the same base name as bwt base
+    # create alternative directory structure to consider this
+
+    # need to configure to grab fastq files from specific directories and
+    # store those paths as simple variables to pass through.
+
+    hm27_base_name = 'hm27_index'
+    hm27_outdir_name = 'hm27_tophat'
+    hm27_gff_file = cwd + '/prokka_hm27/hm27_anno.gff'
+    hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
+    hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
+    build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
+
+    hm46_base_name = 'hm46_index'
+    hm46_outdir_name = 'hm46_tophat'
+    hm46_gff_file = cwd + '/prokka_hm46/hm46_anno.gff'
+    hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
+    hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
+    build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
+
+
+    hm65_base_name = 'hm65_index'
+    hm65_outdir_name = 'hm65_tophat'
+    hm65_gff_file = cwd + '/prokka_hm65/hm65_anno.gff'
+    hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
+    hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
+    build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
+
+    hm69_base_name = 'hm69_index'
+    hm69_outdir_name = 'hm69_tophat'
+    hm69_gff_file = cwd + '/prokka_hm69/hm69_anno.gff'
+    hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
+    hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
+    build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
 
 
     # need to include grabbing file path names
