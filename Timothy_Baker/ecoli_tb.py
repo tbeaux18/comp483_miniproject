@@ -191,7 +191,7 @@ def run_cuffmerge(assembly_file):
 
 def run_cuffdiff(merged_gtf, bam1, bam2, bam3):
 
-    command = "cuffdiff -o diff_results -p 4 {} \\ {} \\ {} \\ {}".format(merged_gtf, bam1, bam2, bam3)
+    command = "cuffdiff -o diff_results -p 4 {}\n{}\n{}\n{}".format(merged_gtf, bam1, bam2, bam3)
 
     subprocess.run(command, shell=True)
 
