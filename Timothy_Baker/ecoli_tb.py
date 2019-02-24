@@ -205,7 +205,7 @@ def samtools_sort(bam_file, output_name):
 def run_cuffnorm(merged_gtf, bam1, bam2, bam3):
 
 
-    command = "cuffdiff -o diff_results -p 4 {} {} {} {}".format(merged_gtf, bam1, bam2, bam3)
+    command = "cuffnorm -o diff_results -p 4 {} {} {} {}".format(merged_gtf, bam1, bam2, bam3)
     subprocess.run(command, shell=True)
 
 
