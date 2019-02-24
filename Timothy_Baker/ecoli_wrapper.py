@@ -9,27 +9,21 @@ ecoli_tb.py
 This module is a python wrapper that pulls the FASTA files from specific FTP URLs from NCBI.
 
 
-6. The assembled genome in RefSeq for E. coli K-12 (NC_000913) has 4140 CDS and 89 tRNAs annotated. Write to the log file the discrepancy (if any) found. For instance, if my Prokka annotation predicted 4315 CDS and 88 tRNA’s, I would write,
-Prokka found 175 additional CDS and 1 less tRNA than the RefSeq in assembly HM27.
+6. The assembled genome in RefSeq for E. coli K-12 (NC_000913) has 4140 CDS and 89 tRNAs annotated.
+Write to the log file the discrepancy (if any) found. For instance, if my Prokka annotation predicted 4315 CDS and 88 tRNA’s,
+I would write, Prokka found 175 additional CDS and 1 less tRNA than the RefSeq in assembly HM27.
 [You’ll likewise write out the number of bp for the other 3 strains.]
 
 
 7. Now that we know where the genes are located, we can see how these genes are transcribed.
-Use TopHat & Cufflinks to map the reads of a specific strain to the genome of the strain and quantify their expression, respectively.
-Details re: the processes of TopHat and Cufflinks can be found in the class slides and Trapnell et al. 2013 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3334321/.
- The accession numbers for the transcriptomes are listed below,
-HM27:  https://www.ncbi.nlm.nih.gov/sra/SRX541301
-ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278956/SRR1278956.sra
-HM46:  https://www.ncbi.nlm.nih.gov/sra/SRX541306
-ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278960/SRR1278960.sra
-HM65:  https://www.ncbi.nlm.nih.gov/sra/SRX541312
-ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR128/SRR1283106/SRR1283106.sra
-HM69:  https://www.ncbi.nlm.nih.gov/sra/SRX541316
-ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278963/SRR1278963.sra
+    Use TopHat & Cufflinks to map the reads of a specific strain to the genome of the strain and quantify their expression, respectively.
 
-9. Using Cuffnorm, normalize all 4 of your transcriptomes. Parse the output of Cuffnorm (the Simple-table gene attributes format file) such that you create a sorted file, with the highest expressed gene first, for each strain and write this to file, e.g. HM27_normalized_sorted.tsv.
+9. Using Cuffnorm, normalize all 4 of your transcriptomes.
+    Parse the output of Cuffnorm (the Simple-table gene attributes format file) such that you create a sorted file,
+    with the highest expressed gene first, for each strain and write this to file, e.g. HM27_normalized_sorted.tsv.
 
 Dependencies:
+    python3 v > 3.5
     Prokka
     tophat2
         tophat
