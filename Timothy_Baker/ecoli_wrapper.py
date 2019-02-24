@@ -180,7 +180,7 @@ def parse_seqio_fasta(fasta_list, log_file):
 
         for seq_record in SeqIO.parse(fasta_file, "fasta"):
             num_of_contigs += 1
-            if len(seq_record.seq) > 1000:
+            if len(seq_record.seq) >= 1000:
                 num_of_bp += len(seq_record.seq)
 
         log_file.write('There are {} contigs in the {} assembly.\n'.format(\
