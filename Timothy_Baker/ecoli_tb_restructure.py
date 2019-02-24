@@ -116,22 +116,20 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
 
 
 
-def build_prokka(fasta_list, output_dir_list, genome_name_list):
+def build_prokka(fasta_list):
 
-    for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
+    prokka_output_dir = ['prokka_hm27', 'prokka_hm46', 'prokka_hm65', 'prokka_hm69']
+
+    genome_name_list = ['hm27_anno', 'hm46_anno', 'hm65_anno', 'hm69_anno']
+
+    for fasta_file, output_dir, genome_name in zip(fasta_list, prokka_output_dir, genome_name_list):
 
         prokka_command = "prokka --outdir {} --prefix {} {} --genus Escherichia".format(output_dir, genome_name, fasta_file)
-        LOGGER.info("Prokkka Command Ran: {}".format(prokka_command))
+
+        LOGGER.info("Prokka Command Ran: {}".format(prokka_command))
+
         subprocess.run(prokka_command, shell=True)
 
-
-
-    # print("Beginning FASTQ Decompression")
-    # this moves to ~/ncbi/public/sra/ directory, fastq-dump needs this directory
-    # otherwise it will redownload it if not found
-    # LOGGER.info("Beginning FASTQ Decompression")
-    # sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
-    # fastq_decomp(sra_files, sra_2_fq)
 
 
 
@@ -223,30 +221,23 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
 
 
-def run_cufflinks_suite(gff_file, output_dir, bam_files):
-    pass
+def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
+    cuff_out_list = ['hm27_cuff', 'hm46_cuff', 'hm65_cuff', 'hm69_cuff']
 
+    for gff_file, cuff_out, sorted_bam in zip(gff_list, cuff_out_list, sorted_bam_list):
+        cufflink_command = "cufflinks -p 4 -G {} -o {} {}".format(gff_file, cuff_out, sorted_bam)
+        subprocess.run(cufflink_command, shell=True)
 
+    cuffmerge_command = "cuffmerge -p 4 -o {} {}".format('merged_ecoli', assembly_file)
+    subprocess.run(cuffmerge_command, shell=True)
 
-def run_cufflinks(gff_file, output_dir, bam_file):
+    cuffnorm_command = "cuffnorm -o diff_results -p 4 {} {} {} {} {}".format(merged_gtf, \
+                                                                    sorted_bam_list[0], \
+                                                                    sorted_bam_list[1], \
+                                                                    sorted_bam_list[2], \
+                                                                    sorted_bam_list[3])
 
-    command = "cufflinks -p 4 -G {} -o {} {}".format(gff_file, output_dir, bam_file)
-    subprocess.run(command, shell=True)
-
-
-def run_cuffmerge(assembly_file):
-
-    command = "cuffmerge -p 4 -o {} {}".format('merged_ecoli', assembly_file)
-
-    subprocess.run(command, shell=True)
-
-def run_cuffdiff(merged_gtf, bam1, bam2, bam3):
-
-    command = "cuffdiff -o diff_results -p 4 {} {} {} {}".format(merged_gtf, bam1, bam2, bam3)
-
-    subprocess.run(command, shell=True)
-
-
+    subprocess.run(cuffnorm_command, shell=True)
 
 
 
@@ -300,6 +291,7 @@ def main():
     bam_file_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
     sorted_bam_list = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam, hm69_sorted_bam]
 
+    merged_gtf = cwd + '/merged_ecoli/merged.gtf'
 
     # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
     # fasta_output_name = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
@@ -321,19 +313,9 @@ def main():
     #                         'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
     # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
     #
-    # sra_files = [HM27_FILES[2], HM46_FILES[2], HM65_FILES[2], HM69_FILES[2]]
-    # sra_files = ['SRR1278956', 'SRR1278960', 'SRR1283106', 'SRR1278963']
-    # sra_dir = ['hm27.sra', 'hm46.sra', 'hm65.sra', 'hm69.sra']
-    # sra_prefetch(sra_files)
-
-    # print("Beginning FASTQ Decompression")
-    # this moves to ~/ncbi/public/sra/ directory, fastq-dump needs this directory
-    # otherwise it will redownload it if not found
-    # LOGGER.info("Beginning FASTQ Decompression")
-    # sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
-    # fastq_decomp(sra_files, sra_2_fq)
 
 
+    # run fastq dump
 
     # Begin bowtie index build
     # need to move all files
@@ -394,15 +376,7 @@ def main():
     # # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
     #
     with open('ecoli_assemblies.txt', 'w') as assemble:
-        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
-    # ./hm69_cuff/transcripts.gtf\n
-
-    print("Running cuffmerge")
-    run_cuffmerge('ecoli_assemblies.txt')
-
-
-    merged_gtf = cwd + '/merged_ecoli/merged.gtf'
-    run_cuffdiff(merged_gtf, hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam)
+        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n/hm69_cuff/transcripts.gtf\n")
 
 
     # need to include grabbing file path names
