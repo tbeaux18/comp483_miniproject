@@ -93,6 +93,7 @@ FILE_HANDLER.setFormatter(FORMATTER)
 
 LOGGER.addHandler(FILE_HANDLER)
 
+# ask for number of threads
 
 
 def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
@@ -113,30 +114,55 @@ def parse_seqio_fasta(fasta_record_list, assembly_name_list, log_file):
         log_file.write('There are {} bp in the {} assembly.\n'.format(\
                                                     num_of_bp, assembly_name))
 
-# def handle_proka_output():
-#
-#     with open(path_to_txt, 'r') as prokka_output:
-#
+
 
 def build_prokka(fasta_list, output_dir_list, genome_name_list):
 
     for fasta_file, output_dir, genome_name in zip(fasta_list, output_dir_list, genome_name_list):
 
         prokka_command = "prokka --outdir {} --prefix {} {} --genus Escherichia".format(output_dir, genome_name, fasta_file)
-
+        LOGGER.info("Prokkka Command Ran: {}".format(prokka_command))
         subprocess.run(prokka_command, shell=True)
 
 
-def fastq_decomp(lst_sra, name_lst):
 
-    for fq, nm in zip(lst_sra, name_lst):
+    # print("Beginning FASTQ Decompression")
+    # this moves to ~/ncbi/public/sra/ directory, fastq-dump needs this directory
+    # otherwise it will redownload it if not found
+    # LOGGER.info("Beginning FASTQ Decompression")
+    # sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
+    # fastq_decomp(sra_files, sra_2_fq)
 
-        LOGGER.info("Decompressing {}".format(fq))
-        fq_command = "fastq-dump -I --split-files {} -O {}".format(fq, nm)
-        print("processing {}".format(fq))
+
+
+def fastq_decomp():
+
+    # local variables, do not overwrite, hardcoded directories for further
+    # downstream analysis
+    sra_files = ['SRR1278956', 'SRR1278960', 'SRR1283106', 'SRR1278963']
+
+    fastq_dir_list = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
+
+    # prefetch places SRA files in $HOME/ncbi/public/sra
+    # do not move
+    for sraf in sra_files:
+        subprocess.run(['prefetch', sraf])
+
+
+    for sra_file, fastq_out in zip(sra_files, fastq_dir_list):
+
+        LOGGER.info("Decompressing {}".format(sra_file))
+
+        fq_command = "fastq-dump -I --split-files {} -O {}".format(sra_file, fastq_out)
+
+        print("Decompressing {}".format(sra_file))
         subprocess.run(fq_command, shell=True)
-        print("finished {}".format(fq))
-        LOGGER.info("Finished {}".format(fq))
+
+        print("Decompression Complete")
+        LOGGER.info("Finished {}".format(sra_file))
+
+
+
 
 
 def wget_gunzip_fasta(ftp_list, output_list):
@@ -151,30 +177,55 @@ def wget_gunzip_fasta(ftp_list, output_list):
         subprocess.run(gunzip_command)
 
 
-def sra_prefetch(lst):
-
-    for file in lst:
-        subprocess.run(['prefetch', file])
 
 
 
-def bwt2_build_index(ref_list, out_list):
+def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file_list, sorted_bam_list):
 
-    for ref_file, base_name in zip(ref_list, out_list):
-        print("Building {} index".format(ref_file))
-        command = "bowtie2-build --threads 2 -f {} {}".format(ref_file, base_name)
-        subprocess.run(command, shell=True)
+    idx_base_list = ['hm27_index', 'hm46_index', 'hm65_index', 'hm69_index']
+
+    tophat_output_dir = ['hm27_tophat', 'hm46_tophat', 'hm65_tophat', 'hm69_tophat']
+
+    # Begins to build the bowtie2 index for each reference sample
+    for fna_file, base_name in zip(fasta_file_list, idx_base_list):
+
+        bwt2_command = "bowtie2-build --threads 2 -f {} {}".format(fna_file, base_name)
+
+        subprocess.run(bwt2_command, shell=True)
 
 
-def build_tophat_alignment(out_dir_name, gff_file, idx_base_name, fastq_1, fastq_2):
+    for gff_file, idx_base_name, tp_out_name, fastq_tup in zip(gff_list, \
+                                                            idx_base_list, \
+                                                            tophat_output_dir, \
+                                                            fastq_tuple_list):
 
-    trans_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
-                                                        idx_base_name, \
-                                                        idx_base_name)
-    command = "tophat2 -p 4 -o {} {} {} {}".format(out_dir_name, idx_base_name, fastq_1, fastq_2)
-    print("Aligning {}".format(idx_base_name))
-    subprocess.run(trans_command, shell=True)
-    subprocess.run(command, shell=True)
+        trans_idx_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
+                                                            idx_base_name, \
+                                                            idx_base_name)
+
+        top_hat_command = "tophat2 -p 4 -o {} {} {} {}".format(tp_out_name, \
+                                                            idx_base_name, \
+                                                            fastq_tup[0], \
+                                                            fastq_tup[1])
+
+        LOGGER.info("Aligning {}".format(idx_base_name))
+
+        subprocess.run(trans_idx_command, shell=True)
+        subprocess.run(top_hat_command, shell=True)
+
+        LOGGER.info("Alignment Complete")
+
+    for bam_file, sorted_out_bam in zip(bam_file_list, sorted_bam_list):
+
+        sort_bam_command = "samtools sort {} -o {}".format(bam_file, sorted_out_bam)
+        subprocess.run(sort_bam_command, shell=True)
+
+
+
+
+def run_cufflinks_suite(gff_file, output_dir, bam_files):
+    pass
+
 
 
 def run_cufflinks(gff_file, output_dir, bam_file):
@@ -195,18 +246,8 @@ def run_cuffdiff(merged_gtf, bam1, bam2, bam3):
 
     subprocess.run(command, shell=True)
 
-def samtools_sort(bam_file, output_name):
-
-    for bmf, out in zip(bam_file, output_name):
-        command = "samtools sort {} -o {}".format(bmf, out)
-        subprocess.run(command, shell=True)
 
 
-def run_cuffnorm(cuff_list, bam_list):
-
-    for cuff, bam in zip(cuff_list, bam_list):
-        command = "cuffdiff -o diff_results -p 4 {} {}".format(cuff, bam)
-        subprocess.run(command, shell=True)
 
 
 def main():
@@ -219,11 +260,45 @@ def main():
     # each of the files go
     cwd = os.getcwd()
 
+    hm27_fasta, hm46_fasta, hm65_fasta, hm69_fasta = 'HM27_FASTA.fna', \
+                                                        'HM46_FASTA.fna', \
+                                                        'HM65_FASTA.fna', \
+                                                        'HM69_FASTA.fna'
 
     hm27_filename = 'HM27_FASTA.fna'
     hm46_filename = 'HM46_FASTA.fna'
     hm65_filename = 'HM65_FASTA.fna'
     hm69_filename = 'HM69_FASTA.fna'
+    hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
+    hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
+    hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
+    hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
+    hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
+    hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
+    hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
+    hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
+    hm27_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
+    hm46_sorted_bam = cwd + '/hm46_tophat/accepted_hits.sorted.bam'
+    hm65_sorted_bam = cwd + '/hm65_tophat/accepted_hits.sorted.bam'
+    hm69_sorted_bam = cwd + '/hm69_tophat/accepted_hits.sorted.bam'
+    hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
+    hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
+    hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
+    hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
+    hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
+    hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
+    hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
+    hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
+
+    fastq_tuple_list = [(hm27_fastq_1, hm27_fastq_2), \
+                        (hm46_fastq_1, hm46_fastq_2), \
+                        (hm65_fastq_1, hm65_fastq_2), \
+                        (hm69_fastq_1, hm69_fastq_2)]
+
+    gff_list = [hm27_gff_file, hm46_gff_file, hm65_gff_file, hm69_gff_file]
+    fasta_file_list = [hm27_fasta, hm46_fasta, hm65_fasta, hm69_fasta]
+    bam_file_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
+    sorted_bam_list = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam, hm69_sorted_bam]
 
 
     # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
@@ -258,9 +333,7 @@ def main():
     # sra_2_fq = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
     # fastq_decomp(sra_files, sra_2_fq)
 
-    # fasta_files = [hm27_filename, hm46_filename, hm65_filename, hm69_filename]
-    # out_index_list = ['hm27_index', 'hm46_index', 'hm65_index', 'hm69_index']
-    # bwt2_build_index(fasta_files, out_index_list)
+
 
     # Begin bowtie index build
     # need to move all files
@@ -279,79 +352,57 @@ def main():
     # hm27_base_name = 'hm27_index'
     # hm27_outdir_name = 'hm27_tophat'
     hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
-    # hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
-    # hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
+
     # build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
     #
     # hm46_base_name = 'hm46_index'
     # hm46_outdir_name = 'hm46_tophat'
     hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
-    # hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
-    # hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
+
     # build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
     #
     #
     # hm65_base_name = 'hm65_index'
     # hm65_outdir_name = 'hm65_tophat'
     hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
-    # hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
-    # hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
+
     # build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
     #
     # hm69_base_name = 'hm69_index'
     # hm69_outdir_name = 'hm69_tophat'
     # hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
-    # hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
-    # hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
+
     # build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
 
-    hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
-    hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
-    hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
-    hm27_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
-    hm46_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
-    hm65_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
 
-    # bam_list = [hm27_bam, hm46_bam, hm65_bam]
-    # output_sorted_list = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam]
-    # print("Sorting BAMS")
-    # samtools_sort(bam_list, output_sorted_list)
-    #
+
 
     # #
-    # print("Running cufflinks")
-    # run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_sorted_bam)
-    # # #
-    #
-    # # #
-    # run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_sorted_bam)
-    # # #
-    #
-    # # #
-    # run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_sorted_bam)
-    # # #
-    # # # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
+    print("Running cufflinks")
+    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_sorted_bam)
+    # #
+
+    # #
+    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_sorted_bam)
+    # #
+
+    # #
+    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_sorted_bam)
+    # #
+    # #
     # #
     # # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
     #
-    # with open('ecoli_assemblies.txt', 'w') as assemble:
-    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
+    with open('ecoli_assemblies.txt', 'w') as assemble:
+        assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n")
     # ./hm69_cuff/transcripts.gtf\n
 
-    # print("Running cuffmerge")
-    # run_cuffmerge('ecoli_assemblies.txt')
+    print("Running cuffmerge")
+    run_cuffmerge('ecoli_assemblies.txt')
 
 
-    # run_cuffdiff(merged_gtf, hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam)
-
-    hm27_cuff = cwd + '/hm27_cuff/transcripts.gtf'
-    hm46_cuff = cwd + '/hm46_cuff/transcripts.gtf'
-    hm65_cuff = cwd + '/hm65_cuff/transcripts.gtf'
-    hm69_cuff = cwd + '/hm69_cuff/transcripts.gtf'
-
-    cuff_list = [hm27_cuff, hm46_cuff, hm65_cuff]
-    sort_bam = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam]
-    run_cuffnorm(cuff_list, sort_bam)
+    merged_gtf = cwd + '/merged_ecoli/merged.gtf'
+    run_cuffdiff(merged_gtf, hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam)
 
 
     # need to include grabbing file path names
