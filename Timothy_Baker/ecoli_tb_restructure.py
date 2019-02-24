@@ -165,6 +165,12 @@ def fastq_decomp():
 
 def wget_gunzip_fasta(ftp_list, output_list):
 
+    fasta_output_name = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
+                            'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz']
+
+    feature_txt_output = ['hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
+                            'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
+
     for ftp_link, output_name in zip(ftp_list, output_list):
         wget_command = ['wget', '-O', output_name, ftp_link]
 
@@ -294,87 +300,24 @@ def main():
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
 
     # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
-    # fasta_output_name = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
-    #                         'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz']
     # wget_gunzip_fasta(fasta_ftp_list, fasta_output_name)
 
-    # filenames_list = [hm27_filename, hm46_filename, hm65_filename, hm69_filename]
-    # output_dir_list = ['prokka_hm27', 'prokka_hm46', 'prokka_hm65', 'prokka_hm69']
-    # genome_names = ['hm27_anno', 'hm46_anno', 'hm65_anno', 'hm69_anno']
-    ## build_prokka(filenames_list, output_dir_list, genome_names)
-
-    # os.system("prokka --outdir prokka_hm27 --prefix hm27_anno {} --genus Escherichia".format(hm27_filename))
-    # os.system("prokka --outdir prokka_hm46 --prefix hm46_anno {} --genus Escherichia".format(hm46_filename))
-    # os.system("prokka --outdir prokka_hm65 --prefix hm65_anno {} --genus Escherichia".format(hm65_filename))
-    # os.system("prokka --outdir prokka_hm69 --prefix hm69_anno {} --genus Escherichia".format(hm69_filename))
 
     # feature_ftp_list = [HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
-    # feature_txt_output = ['hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
-    #                         'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
+
     # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
     #
 
 
-    # run fastq dump
-
-    # Begin bowtie index build
-    # need to move all files
-    # bowtie2-build file index_name
-    # once built, use the tophat to perform the alignments, but need to make sure
-    # all files are within the same index bwt directory
-    # need to use top hat, cuffdiff, and cuffnorm, figure out data structure, and get those alignments
     # need to add copy commmand to make the fasta files the same base name as bwt base
     # create alternative directory structure to consider this
-
     # need to configure to grab fastq files from specific directories and
     # store those paths as simple variables to pass through.
     # may need to change .gff name to the same base name, much of top hats functionality
     # is not kept up
 
-    # hm27_base_name = 'hm27_index'
-    # hm27_outdir_name = 'hm27_tophat'
-    hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
-
-    # build_tophat_alignment(hm27_outdir_name, hm27_gff_file, hm27_base_name, hm27_fastq_1, hm27_fastq_2)
-    #
-    # hm46_base_name = 'hm46_index'
-    # hm46_outdir_name = 'hm46_tophat'
-    hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
-
-    # build_tophat_alignment(hm46_outdir_name, hm46_gff_file, hm46_base_name, hm46_fastq_1, hm46_fastq_2)
-    #
-    #
-    # hm65_base_name = 'hm65_index'
-    # hm65_outdir_name = 'hm65_tophat'
-    hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
-
-    # build_tophat_alignment(hm65_outdir_name, hm65_gff_file, hm65_base_name, hm65_fastq_1, hm65_fastq_2)
-    #
-    # hm69_base_name = 'hm69_index'
-    # hm69_outdir_name = 'hm69_tophat'
-    # hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
-
-    # build_tophat_alignment(hm69_outdir_name, hm69_gff_file, hm69_base_name, hm69_fastq_1, hm69_fastq_2)
 
 
-
-
-    # #
-    print("Running cufflinks")
-    run_cufflinks(hm27_gff_file, 'hm27_cuff', hm27_sorted_bam)
-    # #
-
-    # #
-    run_cufflinks(hm46_gff_file, 'hm46_cuff', hm46_sorted_bam)
-    # #
-
-    # #
-    run_cufflinks(hm65_gff_file, 'hm65_cuff', hm65_sorted_bam)
-    # #
-    # #
-    # #
-    # # run_cufflinks(hm69_gff_file, 'hm69_cuff', hm69_bam)
-    #
     with open('ecoli_assemblies.txt', 'w') as assemble:
         assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n/hm69_cuff/transcripts.gtf\n")
 
