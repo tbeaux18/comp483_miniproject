@@ -85,6 +85,8 @@ HM65_FASTQ_2 = CURRENT_DIR + '/hm65_sra/SRR1283106_2.fastq'
 HM69_FASTQ_1 = CURRENT_DIR + '/hm69_sra/SRR1278963_1.fastq'
 HM69_FASTQ_2 = CURRENT_DIR + '/hm69_sra/SRR1278963_2.fastq'
 
+MERGED_GTF = CURRENT_DIR + '/merged_ecoli/merged.gtf'
+
 # FTP FILES NEEDED FOR ANALYSIS, TUPLE FORMAT, (FASTA FTP LINK, FEATURE COUNT FTP LINK)
 HM27_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_genomic.fna.gz', \
             'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_feature_count.txt.gz')
@@ -438,6 +440,12 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
     LOGGER.info("Normalization complete.")
 
 
+    # with open('ecoli_assemblies.txt', 'w') as assemble:
+    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n/hm69_cuff/transcripts.gtf\n")
+
+
+
+
  #  __  __          _____ _   _
  # |  \/  |   /\   |_   _| \ | |
  # | \  / |  /  \    | | |  \| |
@@ -451,57 +459,62 @@ def main():
 
     log_file = open('UPEC.log', 'w')
 
+    # Storing all constants in lists for efficient looping within large functions
+    # maintains the same order, and ensures no missing files
+
+    # input for ncbi wget, holds ftp paths
+    fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0], \
+                    HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
+
+    # output from ncbi wget
+    fasta_file_list = [HM27_FASTA, HM46_FASTA, HM65_FASTA, HM69_FASTA]
+
+    # output from fastq-dump
     fastq_tuple_list = [(HM27_FASTQ_1, HM27_FASTQ_2), \
                         (HM46_FASTQ_1, HM46_FASTQ_2), \
                         (HM65_FASTQ_1, HM65_FASTQ_2), \
                         (HM69_FASTQ_1, HM69_FASTQ_2)]
 
+    # output from prokka software
     gff_list = [HM27_GFF_FILE, HM46_GFF_FILE, HM65_GFF_FILE, HM69_GFF_FILE]
-    fasta_file_list = [HM27_FASTA, HM46_FASTA, HM65_FASTA, HM69_FASTA]
+
+    # output from tophat2
     bam_file_list = [HM27_BAM, HM46_BAM, HM65_BAM, HM69_BAM]
+
+    # output from samtools sort and tophat2
     sorted_bam_list = [HM27_SORTED_BAM, HM46_SORTED_BAM, HM65_SORTED_BAM, HM69_SORTED_BAM]
 
-    merged_gtf = CURRENT_DIR + '/merged_ecoli/merged.gtf'
 
-    fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0], \
-                    HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
-
-
-
-
-
-    # # grabbing ftp files from ncbi using wget method
-    # LOGGER.info("Beginning to find FTP files.")
-    # wget_gunzip_fasta(fasta_ftp_list)
+    # grabbing ftp files from ncbi using wget method
+    LOGGER.info("Beginning to find FTP files.")
+    wget_gunzip_fasta(fasta_ftp_list)
 
     # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
     LOGGER.info("Parsing FASTA and writing to log file.")
     parse_seqio_fasta(fasta_file_list, log_file)
 
+    LOGGER.info("Starting gene annotation with Prokka")
+    build_prokka(fasta_file_list, log_file)
 
-    # LOGGER.info("Starting gene annotation with Prokka")
-    # build_prokka(fasta_file_list)
-    #
     # LOGGER.info("Grabbing SRA files and converting to FASTQ")
     # prefetch_fastq_decomp()
 
     # need to add copy commmand to make the fasta files the same base name as bwt base
     # create alternative directory structure to consider this
-    # need to configure to grab fastq files from specific directories and
-    # store those paths as simple variables to pass through.
-    # may need to change .gff name to the same base name, much of top hats functionality
-    # is not kept up
 
-    # LOGGER.info("Beginning alignment process.")
-    # build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
-    #                                             bam_file_list, sorted_bam_list)
+    LOGGER.info("Beginning alignment process.")
+    build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
+                                                bam_file_list, sorted_bam_list)
 
-    # with open('ecoli_assemblies.txt', 'w') as assemble:
-    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n/hm69_cuff/transcripts.gtf\n")
-    #
-    # LOGGER.info("Beginning to run cufflinks")
-    # run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', merged_gtf)
+    LOGGER.info("Creating assembly file for cuffmerge.")
+    with open('ecoli_assemblies.txt', 'w') as assemble_file:
+        assemble_file.write("./hm27_cuff/transcripts.gtf\n")
+        assemble_file.write("./hm46_cuff/transcripts.gtf\n")
+        assemble_file.write("./hm65_cuff/transcripts.gtf\n")
+        assemble_file.write("./hm69_cuff/transcripts.gtf\n")
 
+    LOGGER.info("Beginning to run cufflinks")
+    run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', MERGED_GTF)
 
     log_file.close()
 
