@@ -47,8 +47,6 @@ ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR128/SRR1283106
 HM69:  https://www.ncbi.nlm.nih.gov/sra/SRX541316
 ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278963/SRR1278963.sra
 
-8. Using Cuffdiff identify significant changes in transcript expression between the four transcriptomes. We expect, since all 4 are UPEC strains that their expression will be similar, but maybe not. From the Cuffdiff output file, read the cds.diff file. Write to your log each row in which column “significant” is “yes”.
-
 9. Using Cuffnorm, normalize all 4 of your transcriptomes. Parse the output of Cuffnorm (the Simple-table gene attributes format file) such that you create a sorted file, with the highest expressed gene first, for each strain and write this to file, e.g. HM27_normalized_sorted.tsv.
 
 Dependencies:
@@ -130,7 +128,7 @@ def build_prokka(fasta_list):
 
         subprocess.run(prokka_command, shell=True)
 
-
+        LOGGER.info("Prokka_finished for {}".format(genome_name))
 
 
 def fastq_decomp():
@@ -145,7 +143,7 @@ def fastq_decomp():
     # do not move
     for sraf in sra_files:
         subprocess.run(['prefetch', sraf])
-
+        LOGGER.info("Fetched {}".format(sraf))
 
     for sra_file, fastq_out in zip(sra_files, fastq_dir_list):
 
@@ -163,15 +161,15 @@ def fastq_decomp():
 
 
 
-def wget_gunzip_fasta(ftp_list, output_list):
+def wget_gunzip_fasta(ftp_list):
 
-    fasta_output_name = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
-                            'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz']
+    output_names = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
+                    'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz', \
+                    'hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
+                    'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
 
-    feature_txt_output = ['hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
-                            'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
 
-    for ftp_link, output_name in zip(ftp_list, output_list):
+    for ftp_link, output_name in zip(ftp_list, output_names):
         wget_command = ['wget', '-O', output_name, ftp_link]
 
         gunzip_command = ['gunzip', output_name]
@@ -180,7 +178,7 @@ def wget_gunzip_fasta(ftp_list, output_list):
 
         subprocess.run(gunzip_command)
 
-
+        LOGGER.info("Grabbed {}".format(output_name))
 
 
 
@@ -190,27 +188,34 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
     tophat_output_dir = ['hm27_tophat', 'hm46_tophat', 'hm65_tophat', 'hm69_tophat']
 
+    transcriptome_idx = ['transcriptome/hm27', 'transcriptome/hm46', \
+                        'transcriptome/hm65', 'transcriptome/hm69']
+
     # Begins to build the bowtie2 index for each reference sample
     for fna_file, base_name in zip(fasta_file_list, idx_base_list):
 
         bwt2_command = "bowtie2-build --threads 2 -f {} {}".format(fna_file, base_name)
-
+        copy_command = "cp fna_file {}.fa".format(base_name)
         subprocess.run(bwt2_command, shell=True)
+        subprocess.run(copy_command, shell=True)
+        LOGGER.info("Built reference index for {}".format(base_name))
 
-
-    for gff_file, idx_base_name, tp_out_name, fastq_tup in zip(gff_list, \
+    for gff_file, idx_base_name, trans_idx, tp_out_name, fastq_tup in zip(gff_list, \
                                                             idx_base_list, \
+                                                            transcriptome_idx, \
                                                             tophat_output_dir, \
                                                             fastq_tuple_list):
 
         trans_idx_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
-                                                            idx_base_name, \
+                                                            trans_idx, \
                                                             idx_base_name)
 
-        top_hat_command = "tophat2 -p 4 -o {} {} {} {}".format(tp_out_name, \
-                                                            idx_base_name, \
-                                                            fastq_tup[0], \
-                                                            fastq_tup[1])
+        top_hat_command = "tophat2 -p 4 --transcriptome-index={} {} -o {} {} {} {}".format(trans_idx, \
+                                                                                        idx_base_name, \
+                                                                                        tp_out_name, \
+                                                                                        idx_base_name, \
+                                                                                        fastq_tup[0], \
+                                                                                        fastq_tup[1])
 
         LOGGER.info("Aligning {}".format(idx_base_name))
 
@@ -221,10 +226,12 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
     for bam_file, sorted_out_bam in zip(bam_file_list, sorted_bam_list):
 
+        LOGGER.info("Sorting {}".format(bam_file))
+
         sort_bam_command = "samtools sort {} -o {}".format(bam_file, sorted_out_bam)
         subprocess.run(sort_bam_command, shell=True)
 
-
+        LOGGER.info("Finished sorting {}".format(sorted_out_bam))
 
 
 def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
@@ -262,10 +269,6 @@ def main():
                                                         'HM65_FASTA.fna', \
                                                         'HM69_FASTA.fna'
 
-    hm27_filename = 'HM27_FASTA.fna'
-    hm46_filename = 'HM46_FASTA.fna'
-    hm65_filename = 'HM65_FASTA.fna'
-    hm69_filename = 'HM69_FASTA.fna'
     hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
     hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
     hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
@@ -296,18 +299,20 @@ def main():
     fasta_file_list = [hm27_fasta, hm46_fasta, hm65_fasta, hm69_fasta]
     bam_file_list = [hm27_bam, hm46_bam, hm65_bam, hm69_bam]
     sorted_bam_list = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam, hm69_sorted_bam]
-
     merged_gtf = cwd + '/merged_ecoli/merged.gtf'
 
-    # fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0]]
-    # wget_gunzip_fasta(fasta_ftp_list, fasta_output_name)
+    fasta_ftp_list = [HM27_FILES[0], HM46_FILES[0], HM65_FILES[0], HM69_FILES[0], \
+                    HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
 
+    # grabbing ftp files
+    LOGGER.info("Beginning to find FTP files.")
+    wget_gunzip_fasta(fasta_ftp_list)
 
-    # feature_ftp_list = [HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
+    LOGGER.info("Starting gene annotation with Prokka")
+    build_prokka(fasta_file_list)
 
-    # wget_gunzip_fasta(feature_ftp_list, feature_txt_output)
-    #
-
+    LOGGER.info("Grabbing SRA files and converting to FASTQ")
+    fastq_decomp()
 
     # need to add copy commmand to make the fasta files the same base name as bwt base
     # create alternative directory structure to consider this
@@ -316,25 +321,31 @@ def main():
     # may need to change .gff name to the same base name, much of top hats functionality
     # is not kept up
 
+    LOGGER.info("Beginning alignment process.")
+    build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
+                                                bam_file_list, sorted_bam_list)
+
 
 
     with open('ecoli_assemblies.txt', 'w') as assemble:
         assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n/hm69_cuff/transcripts.gtf\n")
 
+    LOGGER.info("Beginning to run cufflinks")
+    run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', merged_gtf)
 
     # need to include grabbing file path names
     # think of how to store these records
-    # hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
-    # hm46_records = list(SeqIO.parse("HM46_FASTA.fna", "fasta"))
-    # hm65_records = list(SeqIO.parse("HM65_FASTA.fna", "fasta"))
-    # hm69_records = list(SeqIO.parse("HM69_FASTA.fna", "fasta"))
+    hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
+    hm46_records = list(SeqIO.parse("HM46_FASTA.fna", "fasta"))
+    hm65_records = list(SeqIO.parse("HM65_FASTA.fna", "fasta"))
+    hm69_records = list(SeqIO.parse("HM69_FASTA.fna", "fasta"))
+
     #
-    # #
-    # # Store all FASTA records in a list for quick retrieval and looping
-    # fasta_record_list = [hm27_records, hm46_records, hm65_records, hm69_records]
-    # fasta_record_output = ['HM27', 'HM46', 'HM65', 'HM69']
-    # parse_seqio_fasta(fasta_record_list, fasta_record_output, log_file)
-    #
+    # Store all FASTA records in a list for quick retrieval and looping
+    fasta_record_list = [hm27_records, hm46_records, hm65_records, hm69_records]
+    fasta_record_output = ['HM27', 'HM46', 'HM65', 'HM69']
+    parse_seqio_fasta(fasta_record_list, fasta_record_output, log_file)
+
     # log_file.write("\nHM27 Prokka Annotation\n")
     # subprocess.run("cat hm27-prokka-output.txt >> UPEC.log", shell=True)
 
