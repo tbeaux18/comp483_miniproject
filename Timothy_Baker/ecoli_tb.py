@@ -202,11 +202,11 @@ def samtools_sort(bam_file, output_name):
         subprocess.run(command, shell=True)
 
 
-def run_cuffnorm(cuff_list, bam_list):
+def run_cuffnorm(merged_gtf, bam1, bam2, bam3):
 
-    for cuff, bam in zip(cuff_list, bam_list):
-        command = "cuffdiff -o diff_results -p 4 {} {}".format(cuff, bam)
-        subprocess.run(command, shell=True)
+
+    command = "cuffdiff -o diff_results -p 4 {} {} {} {}".format(merged_gtf, bam1, bam2, bam3)
+    subprocess.run(command, shell=True)
 
 
 def main():
@@ -344,14 +344,8 @@ def main():
 
     # run_cuffdiff(merged_gtf, hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam)
 
-    hm27_cuff = cwd + '/hm27_cuff/transcripts.gtf'
-    hm46_cuff = cwd + '/hm46_cuff/transcripts.gtf'
-    hm65_cuff = cwd + '/hm65_cuff/transcripts.gtf'
-    hm69_cuff = cwd + '/hm69_cuff/transcripts.gtf'
-
-    cuff_list = [hm27_cuff, hm46_cuff, hm65_cuff]
-    sort_bam = [hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam]
-    run_cuffnorm(cuff_list, sort_bam)
+    merged_gtf = cwd + '/merged_ecoli/merged.gtf'
+    run_cuffnorm(merged_gtf, hm27_sorted_bam, hm46_sorted_bam, hm65_sorted_bam)
 
 
     # need to include grabbing file path names
