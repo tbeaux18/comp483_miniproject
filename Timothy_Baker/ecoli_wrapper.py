@@ -8,31 +8,11 @@ ecoli_tb.py
 
 This module is a python wrapper that pulls the FASTA files from specific FTP URLs from NCBI.
 
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_genomic.fna.gz HM27
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/845/GCF_000387845.2_ASM38784v2/GCF_000387845.2_ASM38784v2_genomic.fna.gz HM46
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/785/GCF_000387785.2_ASM38778v2/GCF_000387785.2_ASM38778v2_genomic.fna.gz HM65
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387865.2_ASM38786v2/GCF_000387865.2_ASM38786v2_genomic.fna.gz HM69
-
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_feature_count.txt.gz HM27
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/845/GCF_000387845.2_ASM38784v2/GCF_000387845.2_ASM38784v2_feature_count.txt.gz HM46
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/785/GCF_000387785.2_ASM38778v2/GCF_000387785.2_ASM38778v2_feature_count.txt.gz HM65
-ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387865.2_ASM38786v2/GCF_000387865.2_ASM38786v2_feature_count.txt.gz HM69
-
-2. Calculate the number of contigs for each assembly and write the # out to the log file as follows:
-There are # contigs in the assembly HM27.
-[You’ll likewise write out the number of contigs for the other 3 strains.]
-
-3. Calculate the length of the assembly (the total number of bp in all of the contigs > 1000 bp in length) and write this # out to the log file as follows:
-There are # bp in the assembly HM27.
-[You’ll likewise write out the number of bp for the other 3 strains.]
-
-4. Use Prokka to annotate these assembly. Since we’re working on an E. coli genome, we are in luck… there’s already an Escherichia genus database. Let’s use it. Write the Prokka command to the log file.
-
-5. Write the results of the annotation in the *.txt file to the log file in the same format as the *.txt file for each strain; add a label so someone reading the log could see which results correspond to which strain.
 
 6. The assembled genome in RefSeq for E. coli K-12 (NC_000913) has 4140 CDS and 89 tRNAs annotated. Write to the log file the discrepancy (if any) found. For instance, if my Prokka annotation predicted 4315 CDS and 88 tRNA’s, I would write,
 Prokka found 175 additional CDS and 1 less tRNA than the RefSeq in assembly HM27.
 [You’ll likewise write out the number of bp for the other 3 strains.]
+
 
 7. Now that we know where the genes are located, we can see how these genes are transcribed.
 Use TopHat & Cufflinks to map the reads of a specific strain to the genome of the strain and quantify their expression, respectively.
@@ -52,11 +32,15 @@ ftp://ftp.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR127/SRR1278963
 Dependencies:
     Prokka
     tophat2
-    bowtie2
+        tophat
+        bowtie2
     sratools
         prefetch
         fastq-dump
-    
+    cufflinks
+        cufflinks
+        cuffmerge
+        cuffnorm
     Biopython
 
 """
@@ -65,6 +49,16 @@ import os
 import subprocess
 import logging
 from Bio import SeqIO
+
+
+ #  _____     _______ _    _  _____
+ # |  __ \ /\|__   __| |  | |/ ____|
+ # | |__) /  \  | |  | |__| | (___
+ # |  ___/ /\ \ | |  |  __  |\___ \
+ # | |  / ____ \| |  | |  | |____) |
+ # |_| /_/    \_\_|  |_|  |_|_____/
+ #
+
 
 CURRENT_DIR = os.getcwd()
 
@@ -172,7 +166,7 @@ def wget_gunzip_fasta(ftp_list):
 
 
 
-def parse_seqio_fasta(fasta_record_list, log_file):
+def parse_seqio_fasta(fasta_list, log_file):
     """ parses the refseq fasta files for each respective strain, counts
         the number of contigs per SeqIO record, and counts the total
         number of base pairs for each contig from each respective genome
@@ -185,22 +179,21 @@ def parse_seqio_fasta(fasta_record_list, log_file):
 
     assembly_name_list = ['HM27', 'HM46', 'HM65', 'HM69']
 
-    for single_fasta_record, assembly_name in zip(fasta_record_list, \
-                                                        assembly_name_list):
-        num_of_contigs = len(single_fasta_record)
+    for fasta_file, assembly_name in zip(fasta_list, assembly_name_list):
 
+        num_of_contigs = 0
         num_of_bp = 0
 
-        for individ_record in single_fasta_record:
-
-            num_of_bp += len(individ_record.seq)
+        for seq_record in SeqIO.parse(fasta_file, "fasta"):
+            num_of_contigs += 1
+            if len(seq_record.seq) > 1000:
+                num_of_bp += len(seq_record.seq)
 
         log_file.write('There are {} contigs in the {} assembly.\n'.format(\
                                                 num_of_contigs, assembly_name))
 
-        log_file.write('There are {} bp in the {} assembly.\n'.format(\
+        log_file.write('There are {} base pairs in the {} assembly.\n'.format(\
                                                     num_of_bp, assembly_name))
-
 
 
  #  _____  _____   ____  _  ___  __
@@ -236,7 +229,7 @@ def build_prokka(fasta_list, log_file):
                                                                                         fasta_file)
 
         LOGGER.info("Prokka Command Ran: {}".format(prokka_command))
-        log_file.write("Prokka Command Ran: s{}".format(prokka_command))
+        log_file.write("Prokka Command Ran: {}".format(prokka_command))
         subprocess.run(prokka_command, shell=True)
 
         LOGGER.info("Prokka_finished for {}".format(genome_name))
@@ -248,10 +241,9 @@ def build_prokka(fasta_list, log_file):
 
         # copies prokka output text file to log file
         with open(txt_prokka_output, 'r') as txt_file:
-            with open(log_file, "w") as output_file:
-                output_file.write("\n{} annotation\n".format(output_dir))
-                for line in txt_file:
-                    output_file.write(line)
+            log_file.write("\n{} annotation\n".format(output_dir))
+            for line in txt_file:
+                log_file.write(str(line))
 
 
 
@@ -374,7 +366,7 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
         top_hat_command = "tophat2 -p 4 --transcriptome-index={} {} -o {} {} {} {}".format(trans_idx, idx_base_name, \
                                                                                             tp_out_name, idx_base_name, \
-                                                                                        fastq_tup[0], fastq_tup[1])
+                                                                                            fastq_tup[0], fastq_tup[1])
 
         LOGGER.info("Aligning {}".format(idx_base_name))
 
@@ -406,15 +398,42 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
  #
 
 def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
+    """ runs cufflinks suite to assemble the transcripts from the sorted
+        bam files, merges them, and then normalizes the gene counts
+        Tools:
+            cufflinks
+            cuffmerge
+            cuffnorm
+        Args:
+            gff_list (lst) : array of paths to the gff files from prokka
+            sorted_bam_list (lst) : array of paths to the sorted bams
+            assembly_file
+            merged_gtf (gtf) : merged from cuffmerge
+        Returns:
+            None
+    """
+
+    # array of top level directory for cufflink output files
     cuff_out_list = ['hm27_cuff', 'hm46_cuff', 'hm65_cuff', 'hm69_cuff']
 
+    # building transcript assemblies with the sorted bam
     for gff_file, cuff_out, sorted_bam in zip(gff_list, cuff_out_list, sorted_bam_list):
-        cufflink_command = "cufflinks -p 4 -G {} -o {} {}".format(gff_file, cuff_out, sorted_bam)
-        subprocess.run(cufflink_command, shell=True)
 
+        LOGGER.info("Assembling transcript for {}".format(cuff_out))
+
+        cufflink_command = "cufflinks -p 4 -G {} -o {} {}".format(gff_file, cuff_out, sorted_bam)
+
+        subprocess.run(cufflink_command, shell=True)
+        LOGGER.info("Assembly complete.")
+
+    # merging each assembled transcriptome into 1 transcript
+    LOGGER.info("Merging all assembled transcripts from each genome.")
     cuffmerge_command = "cuffmerge -p 4 -o {} {}".format('merged_ecoli', assembly_file)
     subprocess.run(cuffmerge_command, shell=True)
+    LOGGER.info("Merging complete.")
 
+    # normalizing the merged transcriptome against each of its sorted bam
+    LOGGER.info("Normalizing the merged transcriptome.")
     cuffnorm_command = "cuffnorm -o diff_results -p 4 {} {} {} {} {}".format(merged_gtf, \
                                                                     sorted_bam_list[0], \
                                                                     sorted_bam_list[1], \
@@ -422,7 +441,7 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
                                                                     sorted_bam_list[3])
 
     subprocess.run(cuffnorm_command, shell=True)
-
+    LOGGER.info("Normalization complete.")
 
 
  #  __  __          _____ _   _
@@ -434,40 +453,9 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
  #
 
 def main():
+    """ runs the main script in linear order, need to optimize for parallel processing"""
 
     log_file = open('UPEC.log', 'w')
-    # when script runs, need to set the current working directory
-    # create the environment variables first of the what the system needs to do
-    # create the appropriate directory on the new system
-    # grab first the working directory so you can properly manage where
-    # each of the files go
-    # cwd = os.getcwd()
-
-    # hm27_fasta, hm46_fasta, hm65_fasta, hm69_fasta = 'HM27_FASTA.fna', \
-    #                                                     'HM46_FASTA.fna', \
-    #                                                     'HM65_FASTA.fna', \
-    #                                                     'HM69_FASTA.fna'
-    #
-    # hm27_gff_file = cwd + '/prokka_hm27/hm27_index.gff'
-    # hm46_gff_file = cwd + '/prokka_hm46/hm46_index.gff'
-    # hm65_gff_file = cwd + '/prokka_hm65/hm65_index.gff'
-    # hm69_gff_file = cwd + '/prokka_hm69/hm69_index.gff'
-    # hm27_bam = cwd + '/hm27_tophat/accepted_hits.bam'
-    # hm46_bam = cwd + '/hm46_tophat/accepted_hits.bam'
-    # hm65_bam = cwd + '/hm65_tophat/accepted_hits.bam'
-    # hm69_bam = cwd + '/hm69_tophat/accepted_hits.bam'
-    # hm27_sorted_bam = cwd + '/hm27_tophat/accepted_hits.sorted.bam'
-    # hm46_sorted_bam = cwd + '/hm46_tophat/accepted_hits.sorted.bam'
-    # hm65_sorted_bam = cwd + '/hm65_tophat/accepted_hits.sorted.bam'
-    # hm69_sorted_bam = cwd + '/hm69_tophat/accepted_hits.sorted.bam'
-    # hm27_fastq_1 = cwd + '/hm27_sra/SRR1278956_1.fastq'
-    # hm27_fastq_2 = cwd + '/hm27_sra/SRR1278956_2.fastq'
-    # hm46_fastq_1 = cwd + '/hm46_sra/SRR1278960_1.fastq'
-    # hm46_fastq_2 = cwd + '/hm46_sra/SRR1278960_2.fastq'
-    # hm65_fastq_1 = cwd + '/hm65_sra/SRR1283106_1.fastq'
-    # hm65_fastq_2 = cwd + '/hm65_sra/SRR1283106_2.fastq'
-    # hm69_fastq_1 = cwd + '/hm69_sra/SRR1278963_1.fastq'
-    # hm69_fastq_2 = cwd + '/hm69_sra/SRR1278963_2.fastq'
 
     fastq_tuple_list = [(HM27_FASTQ_1, HM27_FASTQ_2), \
                         (HM46_FASTQ_1, HM46_FASTQ_2), \
@@ -485,10 +473,18 @@ def main():
                     HM27_FILES[1], HM46_FILES[1], HM65_FILES[1], HM69_FILES[1]]
 
 
-    # # grabbing ftp files
+
+
+
+    # # grabbing ftp files from ncbi using wget method
     # LOGGER.info("Beginning to find FTP files.")
     # wget_gunzip_fasta(fasta_ftp_list)
-    #
+
+    # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
+    LOGGER.info("Parsing FASTA and writing to log file.")
+    parse_seqio_fasta(fasta_file_list, log_file)
+
+
     # LOGGER.info("Starting gene annotation with Prokka")
     # build_prokka(fasta_file_list)
     #
@@ -511,21 +507,6 @@ def main():
     #
     # LOGGER.info("Beginning to run cufflinks")
     # run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', merged_gtf)
-
-    # need to include grabbing file path names
-    # think of how to store these records
-    hm27_records = list(SeqIO.parse("HM27_FASTA.fna", "fasta"))
-    hm46_records = list(SeqIO.parse("HM46_FASTA.fna", "fasta"))
-    hm65_records = list(SeqIO.parse("HM65_FASTA.fna", "fasta"))
-    hm69_records = list(SeqIO.parse("HM69_FASTA.fna", "fasta"))
-
-
-    # Store all FASTA records in a list for quick retrieval and looping
-    # fasta_record_list = [hm27_records, hm46_records, hm65_records, hm69_records]
-    # parse_seqio_fasta(fasta_record_list, fasta_record_output, log_file)
-
-    # log_file.write("\nHM27 Prokka Annotation\n")
-    # subprocess.run("cat hm27-prokka-output.txt >> UPEC.log", shell=True)
 
 
     log_file.close()
