@@ -39,6 +39,7 @@ Dependencies:
 """
 
 import os
+import sys
 import argparse
 import subprocess
 import logging
@@ -75,7 +76,8 @@ else:
     os.chdir(FIRST_LAST_PATH)
 
 CURRENT_DIR = os.getcwd()
-
+print(CURRENT_DIR)
+sys.exit()
 FASTA_DIR_PATH = './ncbi_fasta'
 
 HM27_FASTA = './ncbi_fasta/HM27_FASTA.fna'
@@ -83,10 +85,10 @@ HM46_FASTA = './ncbi_fasta/HM46_FASTA.fna'
 HM65_FASTA = './ncbi_fasta/HM65_FASTA.fna'
 HM69_FASTA = './ncbi_fasta/HM69_FASTA.fna'
 
-HM27_GFF_FILE = './prokka_hm27/hm27_index.gff'
-HM46_GFF_FILE = './prokka_hm46/hm46_index.gff'
-HM65_GFF_FILE = './prokka_hm65/hm65_index.gff'
-HM69_GFF_FILE = './prokka_hm69/hm69_index.gff'
+HM27_GFF_FILE = './hm27_index.gff'
+HM46_GFF_FILE = './hm46_index.gff'
+HM65_GFF_FILE = './hm65_index.gff'
+HM69_GFF_FILE = './hm69_index.gff'
 
 HM27_BAM = './hm27_tophat/accepted_hits.bam'
 HM46_BAM = './hm46_tophat/accepted_hits.bam'
