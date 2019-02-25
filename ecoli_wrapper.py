@@ -366,10 +366,10 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
         LOGGER.info("Copied {} file to {}.fa".format(fna_file, base_name))
         LOGGER.info("Built reference index for {}".format(base_name))
 
-    os.mkdir('./transcriptome/hm27')
-    os.mkdir('./transcriptome/hm46')
-    os.mkdir('./transcriptome/hm65')
-    os.mkdir('./transcriptome/hm69')
+    os.makedirs('./transcriptome/hm27')
+    os.makedirs('./transcriptome/hm46')
+    os.makedirs('./transcriptome/hm65')
+    os.makedirs('./transcriptome/hm69')
     LOGGER.info("Beginning tophat to perform alignment.")
     for trans_idx, gff_file, idx_base_name, tp_out_name, fastq_tup in zip(trans_idx_list, gff_list, \
                                                             idx_base_list, \
