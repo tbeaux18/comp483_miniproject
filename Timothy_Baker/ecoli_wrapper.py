@@ -40,10 +40,11 @@ Dependencies:
 """
 
 import os
+import argparse
 import subprocess
 import logging
 from Bio import SeqIO
-
+import sys
 
  #  _____     _______ _    _  _____
  # |  __ \ /\|__   __| |  | |/ ____|
@@ -53,6 +54,10 @@ from Bio import SeqIO
  # |_| /_/    \_\_|  |_|  |_|_____/
  #
 
+
+FIRST_LAST_PATH = './Timothy_Baker'
+os.mkdir(FIRST_LAST_PATH)
+os.chdir(FIRST_LAST_PATH)
 
 CURRENT_DIR = os.getcwd()
 
@@ -121,6 +126,18 @@ FILE_HANDLER = logging.FileHandler("working.log")
 FILE_HANDLER.setFormatter(FORMATTER)
 
 LOGGER.addHandler(FILE_HANDLER)
+
+
+
+def arg_parser():
+    """ Argument input from command line """
+
+    parser = argparse.ArgumentParser(
+        description='RNA-seq python wrapper for 4 E.Coli genomes.\n'
+    )
+    parser.add_argument('-t', '--threads', help='Integer declaring how many threads to run')
+
+    return parser.parse_args()
 
 
 
@@ -307,7 +324,7 @@ def prefetch_fastq_decomp():
  #    |_|  \____/|_|    |_|  |_/_/    \_\_|
  #
 
-def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file_list, sorted_bam_list):
+def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file_list, sorted_bam_list, threads):
     """ main tophat/bowtie2 build. requires that the reference fasta files that were found
         are indexed by bowtie2. Once indexed by bowtie2, tophat will create a transcriptome
         index that is used for alignment. After that is built, tophat2 will perform the
@@ -342,7 +359,7 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
     LOGGER.info("Beginning bowtie2 to build reference index.")
     for fna_file, base_name in zip(fasta_file_list, idx_base_list):
 
-        bwt2_command = "bowtie2-build --threads 2 -f {} {}".format(fna_file, base_name)
+        bwt2_command = "bowtie2-build --threads {} -f {} {}".format(threads, fna_file, base_name)
         copy_command = "cp fna_file {}.fa".format(base_name)
         subprocess.run(bwt2_command, shell=True)
         subprocess.run(copy_command, shell=True)
@@ -360,7 +377,7 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
                                                             trans_idx, \
                                                             idx_base_name)
 
-        top_hat_command = "tophat2 -p 4 --transcriptome-index={} {} -o {} {} {} {}".format(trans_idx, idx_base_name, \
+        top_hat_command = "tophat2 -p {} --transcriptome-index={} {} -o {} {} {} {}".format(threads, trans_idx, idx_base_name, \
                                                                                             tp_out_name, idx_base_name, \
                                                                                             fastq_tup[0], fastq_tup[1])
 
@@ -393,7 +410,7 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
  #  \_____|\____/|_|    |_|    |______|_____|_| \_|_|\_\_____/
  #
 
-def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
+def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf, threads):
     """ runs cufflinks suite to assemble the transcripts from the sorted
         bam files, merges them, and then normalizes the gene counts
         Tools:
@@ -417,20 +434,20 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
 
         LOGGER.info("Assembling transcript for {}".format(cuff_out))
 
-        cufflink_command = "cufflinks -p 4 -G {} -o {} {}".format(gff_file, cuff_out, sorted_bam)
+        cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, gff_file, cuff_out, sorted_bam)
 
         subprocess.run(cufflink_command, shell=True)
         LOGGER.info("Assembly complete.")
 
     # merging each assembled transcriptome into 1 transcript
     LOGGER.info("Merging all assembled transcripts from each genome.")
-    cuffmerge_command = "cuffmerge -p 4 -o {} {}".format('merged_ecoli', assembly_file)
+    cuffmerge_command = "cuffmerge -p {} -o {} {}".format(threads, 'merged_ecoli', assembly_file)
     subprocess.run(cuffmerge_command, shell=True)
     LOGGER.info("Merging complete.")
 
     # normalizing the merged transcriptome against each of its sorted bam
     LOGGER.info("Normalizing the merged transcriptome.")
-    cuffnorm_command = "cuffnorm -o diff_results -p 4 {} {} {} {} {}".format(merged_gtf, \
+    cuffnorm_command = "cuffnorm -o diff_results -p {} {} {} {} {} {}".format(threads, merged_gtf, \
                                                                     sorted_bam_list[0], \
                                                                     sorted_bam_list[1], \
                                                                     sorted_bam_list[2], \
@@ -438,11 +455,6 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
 
     subprocess.run(cuffnorm_command, shell=True)
     LOGGER.info("Normalization complete.")
-
-
-    # with open('ecoli_assemblies.txt', 'w') as assemble:
-    #     assemble.write("./hm27_cuff/transcripts.gtf\n./hm46_cuff/transcripts.gtf\n./hm65_cuff/transcripts.gtf\n/hm69_cuff/transcripts.gtf\n")
-
 
 
 
@@ -457,6 +469,11 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf):
 def main():
     """ runs the main script in linear order, need to optimize for parallel processing"""
 
+    args = arg_parser()
+    threads = args.threads
+    LOGGER.info("{} threads flagged to run each software.".format(threads))
+
+    LOGGER.info("Pipeline beginning.")
     log_file = open('UPEC.log', 'w')
 
     # Storing all constants in lists for efficient looping within large functions
@@ -484,7 +501,6 @@ def main():
     # output from samtools sort and tophat2
     sorted_bam_list = [HM27_SORTED_BAM, HM46_SORTED_BAM, HM65_SORTED_BAM, HM69_SORTED_BAM]
 
-
     # grabbing ftp files from ncbi using wget method
     LOGGER.info("Beginning to find FTP files.")
     wget_gunzip_fasta(fasta_ftp_list)
@@ -496,16 +512,14 @@ def main():
     LOGGER.info("Starting gene annotation with Prokka")
     build_prokka(fasta_file_list, log_file)
 
-    # LOGGER.info("Grabbing SRA files and converting to FASTQ")
-    # prefetch_fastq_decomp()
-
-    # need to add copy commmand to make the fasta files the same base name as bwt base
-    # create alternative directory structure to consider this
-
-    LOGGER.info("Beginning alignment process.")
-    build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
-                                                bam_file_list, sorted_bam_list)
-
+    # # LOGGER.info("Grabbing SRA files and converting to FASTQ")
+    # # prefetch_fastq_decomp()
+    #
+    #
+    # LOGGER.info("Beginning alignment process.")
+    # build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
+    #                                             bam_file_list, sorted_bam_list, threads)
+    #
     LOGGER.info("Creating assembly file for cuffmerge.")
     with open('ecoli_assemblies.txt', 'w') as assemble_file:
         assemble_file.write("./hm27_cuff/transcripts.gtf\n")
@@ -514,8 +528,9 @@ def main():
         assemble_file.write("./hm69_cuff/transcripts.gtf\n")
 
     LOGGER.info("Beginning to run cufflinks")
-    run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', MERGED_GTF)
+    run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', MERGED_GTF, threads)
 
+    LOGGER.info("Pipeline Complete.")
     log_file.close()
 
 if __name__ == '__main__':
