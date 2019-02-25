@@ -251,7 +251,7 @@ def build_prokka(fasta_list, log_file):
 
         LOGGER.info("Prokka_finished for {}".format(genome_name))
 
-        txt_prokka_output = CURRENT_DIR + '/{}/{}.txt'.format(output_dir, genome_name)
+        txt_prokka_output = './{}/{}.txt'.format(output_dir, genome_name)
 
         LOGGER.info("Output Directory Check {}".format(txt_prokka_output))
         LOGGER.info("Copying {}.txt contents to log file".format(genome_name))
@@ -478,7 +478,7 @@ def main():
     LOGGER.info("{} threads flagged to run each software.".format(threads))
 
     LOGGER.info("Pipeline beginning.")
-    log_file = open('UPEC.log', 'w')
+    log_file = open('UPEC.log', 'a+')
 
     # Storing all constants in lists for efficient looping within large functions
     # maintains the same order, and ensures no missing files
@@ -506,15 +506,17 @@ def main():
     sorted_bam_list = [HM27_SORTED_BAM, HM46_SORTED_BAM, HM65_SORTED_BAM, HM69_SORTED_BAM]
 
     # grabbing ftp files from ncbi using wget method
-    LOGGER.info("Beginning to find FTP files.")
-    wget_gunzip_fasta(fasta_ftp_list)
+    # LOGGER.info("Beginning to find FTP files.")
+    # wget_gunzip_fasta(fasta_ftp_list)
 
     # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
     LOGGER.info("Parsing FASTA and writing to log file.")
     parse_seqio_fasta(fasta_file_list, log_file)
 
-    LOGGER.info("Starting gene annotation with Prokka")
-    build_prokka(fasta_file_list, log_file)
+    # NEED TO FIX THE DIRECTORY PATH FOR WRITING TO THE LOG FILE!!
+
+    # LOGGER.info("Starting gene annotation with Prokka")
+    # build_prokka(fasta_file_list, log_file)
 
     # LOGGER.info("Grabbing SRA files and converting to FASTQ")
     # prefetch_fastq_decomp()
