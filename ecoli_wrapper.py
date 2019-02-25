@@ -66,9 +66,13 @@ HM69_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387
             'ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/865/GCF_000387865.2_ASM38786v2/GCF_000387865.2_ASM38786v2_feature_count.txt.gz')
 
 
+
 FIRST_LAST_PATH = './Timothy_Baker'
-os.mkdir(FIRST_LAST_PATH)
-os.chdir(FIRST_LAST_PATH)
+if os.path.isdir('./Timothy_Baker'):
+    os.chdir(FIRST_LAST_PATH)
+else:
+    os.mkdir(FIRST_LAST_PATH)
+    os.chdir(FIRST_LAST_PATH)
 
 CURRENT_DIR = os.getcwd()
 
