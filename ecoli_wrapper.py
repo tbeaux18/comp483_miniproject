@@ -360,7 +360,7 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
     for fna_file, base_name in zip(fasta_file_list, idx_base_list):
 
         bwt2_command = "bowtie2-build --threads {} -f {} {}".format(threads, fna_file, base_name)
-        copy_command = "cp fna_file ../{}.fa".format(base_name)
+        copy_command = "cp {} ../{}.fa".format(fna_file, base_name)
         subprocess.run(bwt2_command, shell=True)
         subprocess.run(copy_command, shell=True)
         LOGGER.info("Copied {} file to {}.fa".format(fna_file, base_name))
