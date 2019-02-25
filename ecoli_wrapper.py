@@ -76,8 +76,7 @@ else:
     os.chdir(FIRST_LAST_PATH)
 
 CURRENT_DIR = os.getcwd()
-print(CURRENT_DIR)
-sys.exit()
+
 FASTA_DIR_PATH = './ncbi_fasta'
 
 HM27_FASTA = './ncbi_fasta/HM27_FASTA.fna'
