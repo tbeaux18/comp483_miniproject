@@ -351,8 +351,8 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
     tophat_output_dir = ['hm27_tophat', 'hm46_tophat', 'hm65_tophat', 'hm69_tophat']
 
-    trans_idx_list = ['./transcriptome/hm27', './transcriptome/hm46', \
-    './transcriptome/hm65', './transcriptome/hm69']
+    trans_idx_list = ['./transcriptome/hm27_index/', './transcriptome/hm46_index/', \
+    './transcriptome/hm65_index/', './transcriptome/hm69_index/']
     # Begins to build the bowtie2 index for each reference sample
     # Must make a copy of the fasta file into the same format as base name
     # for tophat2, but with the .fa file type, NOT .fna.
@@ -366,10 +366,10 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
         LOGGER.info("Copied {} file to {}.fa".format(fna_file, base_name))
         LOGGER.info("Built reference index for {}".format(base_name))
 
-    os.makedirs('./transcriptome/hm27')
-    os.makedirs('./transcriptome/hm46')
-    os.makedirs('./transcriptome/hm65')
-    os.makedirs('./transcriptome/hm69')
+    os.makedirs('./transcriptome/hm27_index')
+    os.makedirs('./transcriptome/hm46_index')
+    os.makedirs('./transcriptome/hm65_index')
+    os.makedirs('./transcriptome/hm69_index')
     LOGGER.info("Beginning tophat to perform alignment.")
     for trans_idx, gff_file, idx_base_name, tp_out_name, fastq_tup in zip(trans_idx_list, gff_list, \
                                                             idx_base_list, \
