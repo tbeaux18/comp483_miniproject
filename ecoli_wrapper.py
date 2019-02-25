@@ -351,8 +351,8 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
     tophat_output_dir = ['hm27_tophat', 'hm46_tophat', 'hm65_tophat', 'hm69_tophat']
 
-    trans_idx_list = ['./transcriptome/hm27_index/', './transcriptome/hm46_index/', \
-    './transcriptome/hm65_index/', './transcriptome/hm69_index/']
+    trans_idx_list = ['./transcriptome/hm27_index', './transcriptome/hm46_index', \
+    './transcriptome/hm65_index', './transcriptome/hm69_index']
     # Begins to build the bowtie2 index for each reference sample
     # Must make a copy of the fasta file into the same format as base name
     # for tophat2, but with the .fa file type, NOT .fna.
