@@ -504,23 +504,23 @@ def main():
     sorted_bam_list = [HM27_SORTED_BAM, HM46_SORTED_BAM, HM65_SORTED_BAM, HM69_SORTED_BAM]
 
     # grabbing ftp files from ncbi using wget method
-    LOGGER.info("Beginning to find FTP files.")
-    wget_gunzip_fasta(fasta_ftp_list)
-
-    # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
-    LOGGER.info("Parsing FASTA and writing to log file.")
-    parse_seqio_fasta(fasta_file_list, log_file)
-
-    LOGGER.info("Starting gene annotation with Prokka")
-    build_prokka(fasta_file_list, log_file)
+    # LOGGER.info("Beginning to find FTP files.")
+    # wget_gunzip_fasta(fasta_ftp_list)
+    #
+    # # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
+    # LOGGER.info("Parsing FASTA and writing to log file.")
+    # parse_seqio_fasta(fasta_file_list, log_file)
+    #
+    # LOGGER.info("Starting gene annotation with Prokka")
+    # build_prokka(fasta_file_list, log_file)
 
     # LOGGER.info("Grabbing SRA files and converting to FASTQ")
     # prefetch_fastq_decomp()
 
-    # LOGGER.info("Beginning alignment process.")
-    # build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
-    #                                             bam_file_list, sorted_bam_list, threads)
-    #
+    LOGGER.info("Beginning alignment process.")
+    build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
+                                                bam_file_list, sorted_bam_list, threads)
+
     # LOGGER.info("Creating assembly file for cuffmerge.")
     # with open('ecoli_assemblies.txt', 'w') as assemble_file:
     #     assemble_file.write("./hm27_cuff/transcripts.gtf\n")
