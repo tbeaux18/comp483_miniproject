@@ -375,9 +375,9 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
                                                             trans_idx, \
                                                             idx_base_name)
 
-        top_hat_command = "tophat2 -p {} --transcriptome-index={} {} -o {} {} {} {}".format(threads, trans_idx, idx_base_name, \
-                                                                                            tp_out_name, idx_base_name, \
-                                                                                            fastq_tup[0], fastq_tup[1])
+        top_hat_command = "tophat2 -o {} -p {} --transcriptome-index={} {} {} {}".format(tp_out_name, threads, \
+                                                                        trans_idx, idx_base_name, \
+                                                                        fastq_tup[0], fastq_tup[1])
 
         LOGGER.info("Aligning {}".format(idx_base_name))
 
