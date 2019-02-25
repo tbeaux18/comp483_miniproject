@@ -237,7 +237,7 @@ def build_prokka(fasta_list, log_file):
     prokka_output_dir = ['prokka_hm27', 'prokka_hm46', 'prokka_hm65', 'prokka_hm69']
 
     # base name for each prokka file in each prokka_output_directory
-    genome_name_list = ['hm27_anno', 'hm46_anno', 'hm65_anno', 'hm69_anno']
+    genome_name_list = ['hm27_index', 'hm46_index', 'hm65_index', 'hm69_index']
 
     for fasta_file, output_dir, genome_name in zip(fasta_list, prokka_output_dir, genome_name_list):
 
@@ -369,16 +369,18 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
 
     LOGGER.info("Beginning tophat to perform alignment.")
-    for gff_file, trans_idx, idx_base_name in zip(trans_idx_list, gff_list, idx_base_list):
+    for gff_file, trans_idx, idx_base_name in zip(gff_list, trans_idx_list, idx_base_list):
 
         trans_idx_command = "tophat2 -G {} --transcriptome-index={} {}".format(gff_file, \
                                                                 trans_idx, idx_base_name)
         subprocess.run(trans_idx_command, shell=True)
-    sys.exit()
-    for tp_out_name, trans_idx, idx_base_name, fastq_tup in zip(tophat_output_dir, gff_list, \
-                                                                idx_base_list, fastq_tuple_list):
 
-        top_hat_command = "tophat2 -p {} -o {} --transcriptome-index={} {} {} {}".format(threads, tp_out_name, trans_idx, idx_base_name, fastq_tup[0], fastq_tup[1])
+    for tp_out_name, trans_idx, idx_base_name, fastq_tup in zip(tophat_output_dir, trans_idx_list, \
+                                                                    idx_base_list, fastq_tuple_list):
+
+        top_hat_command = "tophat2 -p {} -o {} --transcriptome-index={} {} {} {}".format(threads, tp_out_name, \
+                                                                        trans_idx, idx_base_name, \
+                                                                        fastq_tup[0], fastq_tup[1])
 
         LOGGER.info("Aligning {}".format(idx_base_name))
 
@@ -504,15 +506,15 @@ def main():
     sorted_bam_list = [HM27_SORTED_BAM, HM46_SORTED_BAM, HM65_SORTED_BAM, HM69_SORTED_BAM]
 
     # grabbing ftp files from ncbi using wget method
-    # LOGGER.info("Beginning to find FTP files.")
-    # wget_gunzip_fasta(fasta_ftp_list)
-    #
-    # # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
-    # LOGGER.info("Parsing FASTA and writing to log file.")
-    # parse_seqio_fasta(fasta_file_list, log_file)
-    #
-    # LOGGER.info("Starting gene annotation with Prokka")
-    # build_prokka(fasta_file_list, log_file)
+    LOGGER.info("Beginning to find FTP files.")
+    wget_gunzip_fasta(fasta_ftp_list)
+
+    # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
+    LOGGER.info("Parsing FASTA and writing to log file.")
+    parse_seqio_fasta(fasta_file_list, log_file)
+
+    LOGGER.info("Starting gene annotation with Prokka")
+    build_prokka(fasta_file_list, log_file)
 
     # LOGGER.info("Grabbing SRA files and converting to FASTQ")
     # prefetch_fastq_decomp()
