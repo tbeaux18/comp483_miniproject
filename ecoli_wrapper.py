@@ -207,10 +207,10 @@ def parse_seqio_fasta(fasta_list, log_file):
                 num_of_bp += len(seq_record.seq)
 
         log_file.write('There are {} contigs in the {} assembly.\n'.format(\
-                                                num_of_contigs, assembly_name))
+                                                str(num_of_contigs), str(assembly_name)))
 
         log_file.write('There are {} base pairs in the {} assembly.\n'.format(\
-                                                    num_of_bp, assembly_name))
+                                                    str(num_of_bp), str(assembly_name)))
 
 
  #  _____  _____   ____  _  ___  __
