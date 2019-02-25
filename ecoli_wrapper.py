@@ -517,19 +517,19 @@ def main():
     # LOGGER.info("Grabbing SRA files and converting to FASTQ")
     # prefetch_fastq_decomp()
 
-    LOGGER.info("Beginning alignment process.")
-    build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
-                                                bam_file_list, sorted_bam_list, threads)
-
-    LOGGER.info("Creating assembly file for cuffmerge.")
-    with open('ecoli_assemblies.txt', 'w') as assemble_file:
-        assemble_file.write("./hm27_cuff/transcripts.gtf\n")
-        assemble_file.write("./hm46_cuff/transcripts.gtf\n")
-        assemble_file.write("./hm65_cuff/transcripts.gtf\n")
-        assemble_file.write("./hm69_cuff/transcripts.gtf\n")
-
-    LOGGER.info("Beginning to run cufflinks")
-    run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', MERGED_GTF, threads)
+    # LOGGER.info("Beginning alignment process.")
+    # build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
+    #                                             bam_file_list, sorted_bam_list, threads)
+    #
+    # LOGGER.info("Creating assembly file for cuffmerge.")
+    # with open('ecoli_assemblies.txt', 'w') as assemble_file:
+    #     assemble_file.write("./hm27_cuff/transcripts.gtf\n")
+    #     assemble_file.write("./hm46_cuff/transcripts.gtf\n")
+    #     assemble_file.write("./hm65_cuff/transcripts.gtf\n")
+    #     assemble_file.write("./hm69_cuff/transcripts.gtf\n")
+    #
+    # LOGGER.info("Beginning to run cufflinks")
+    # run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', MERGED_GTF, threads)
 
     LOGGER.info("Pipeline Complete.")
     log_file.close()
