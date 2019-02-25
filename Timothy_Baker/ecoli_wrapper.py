@@ -4,7 +4,7 @@
 @author: Timothy Baker
 @version: 1.0.0
 
-ecoli_tb.py
+ecoli_wrapper.py
 
 This module is a python wrapper that pulls the FASTA files from specific FTP URLs from NCBI.
 
@@ -13,7 +13,6 @@ This module is a python wrapper that pulls the FASTA files from specific FTP URL
 Write to the log file the discrepancy (if any) found. For instance, if my Prokka annotation predicted 4315 CDS and 88 tRNA’s,
 I would write, Prokka found 175 additional CDS and 1 less tRNA than the RefSeq in assembly HM27.
 [You’ll likewise write out the number of bp for the other 3 strains.]
-
 
 7. Now that we know where the genes are located, we can see how these genes are transcribed.
     Use TopHat & Cufflinks to map the reads of a specific strain to the genome of the strain and quantify their expression, respectively.
@@ -44,7 +43,6 @@ import argparse
 import subprocess
 import logging
 from Bio import SeqIO
-import sys
 
  #  _____     _______ _    _  _____
  # |  __ \ /\|__   __| |  | |/ ____|
@@ -61,36 +59,38 @@ os.chdir(FIRST_LAST_PATH)
 
 CURRENT_DIR = os.getcwd()
 
-HM27_FASTA = 'HM27_FASTA.fna'
-HM46_FASTA = 'HM46_FASTA.fna'
-HM65_FASTA = 'HM65_FASTA.fna'
-HM69_FASTA = 'HM69_FASTA.fna'
+FASTA_DIR_PATH = './ncbi_fasta'
 
-HM27_GFF_FILE = CURRENT_DIR + '/prokka_hm27/hm27_index.gff'
-HM46_GFF_FILE = CURRENT_DIR + '/prokka_hm46/hm46_index.gff'
-HM65_GFF_FILE = CURRENT_DIR + '/prokka_hm65/hm65_index.gff'
-HM69_GFF_FILE = CURRENT_DIR + '/prokka_hm69/hm69_index.gff'
+HM27_FASTA = './ncbi_fasta/HM27_FASTA.fna'
+HM46_FASTA = './ncbi_fasta/HM46_FASTA.fna'
+HM65_FASTA = './ncbi_fasta/HM65_FASTA.fna'
+HM69_FASTA = './ncbi_fasta/HM69_FASTA.fna'
 
-HM27_BAM = CURRENT_DIR + '/hm27_tophat/accepted_hits.bam'
-HM46_BAM = CURRENT_DIR + '/hm46_tophat/accepted_hits.bam'
-HM65_BAM = CURRENT_DIR + '/hm65_tophat/accepted_hits.bam'
-HM69_BAM = CURRENT_DIR + '/hm69_tophat/accepted_hits.bam'
+HM27_GFF_FILE = './prokka_hm27/hm27_index.gff'
+HM46_GFF_FILE = './prokka_hm46/hm46_index.gff'
+HM65_GFF_FILE = './prokka_hm65/hm65_index.gff'
+HM69_GFF_FILE = './prokka_hm69/hm69_index.gff'
 
-HM27_SORTED_BAM = CURRENT_DIR + '/hm27_tophat/accepted_hits.sorted.bam'
-HM46_SORTED_BAM = CURRENT_DIR + '/hm46_tophat/accepted_hits.sorted.bam'
-HM65_SORTED_BAM = CURRENT_DIR + '/hm65_tophat/accepted_hits.sorted.bam'
-HM69_SORTED_BAM = CURRENT_DIR + '/hm69_tophat/accepted_hits.sorted.bam'
+HM27_BAM = './hm27_tophat/accepted_hits.bam'
+HM46_BAM = './hm46_tophat/accepted_hits.bam'
+HM65_BAM = './hm65_tophat/accepted_hits.bam'
+HM69_BAM = './hm69_tophat/accepted_hits.bam'
 
-HM27_FASTQ_1 = CURRENT_DIR + '/hm27_sra/SRR1278956_1.fastq'
-HM27_FASTQ_2 = CURRENT_DIR + '/hm27_sra/SRR1278956_2.fastq'
-HM46_FASTQ_1 = CURRENT_DIR + '/hm46_sra/SRR1278960_1.fastq'
-HM46_FASTQ_2 = CURRENT_DIR + '/hm46_sra/SRR1278960_2.fastq'
-HM65_FASTQ_1 = CURRENT_DIR + '/hm65_sra/SRR1283106_1.fastq'
-HM65_FASTQ_2 = CURRENT_DIR + '/hm65_sra/SRR1283106_2.fastq'
-HM69_FASTQ_1 = CURRENT_DIR + '/hm69_sra/SRR1278963_1.fastq'
-HM69_FASTQ_2 = CURRENT_DIR + '/hm69_sra/SRR1278963_2.fastq'
+HM27_SORTED_BAM = './hm27_tophat/accepted_hits.sorted.bam'
+HM46_SORTED_BAM = './hm46_tophat/accepted_hits.sorted.bam'
+HM65_SORTED_BAM = './hm65_tophat/accepted_hits.sorted.bam'
+HM69_SORTED_BAM = './hm69_tophat/accepted_hits.sorted.bam'
 
-MERGED_GTF = CURRENT_DIR + '/merged_ecoli/merged.gtf'
+HM27_FASTQ_1 = './hm27_sra/SRR1278956_1.fastq'
+HM27_FASTQ_2 = './hm27_sra/SRR1278956_2.fastq'
+HM46_FASTQ_1 = './hm46_sra/SRR1278960_1.fastq'
+HM46_FASTQ_2 = './hm46_sra/SRR1278960_2.fastq'
+HM65_FASTQ_1 = './hm65_sra/SRR1283106_1.fastq'
+HM65_FASTQ_2 = './hm65_sra/SRR1283106_2.fastq'
+HM69_FASTQ_1 = './hm69_sra/SRR1278963_1.fastq'
+HM69_FASTQ_2 = './hm69_sra/SRR1278963_2.fastq'
+
+MERGED_GTF = './merged_ecoli/merged.gtf'
 
 # FTP FILES NEEDED FOR ANALYSIS, TUPLE FORMAT, (FASTA FTP LINK, FEATURE COUNT FTP LINK)
 HM27_FILES = ('ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_genomic.fna.gz', \
@@ -166,6 +166,8 @@ def wget_gunzip_fasta(ftp_list):
                     'hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
                     'hm65_feature.txt.gz', 'hm69_feature.txt.gz']
 
+    os.mkdir(FASTA_DIR_PATH)
+    os.chdir(FASTA_DIR_PATH)
     # does not execute through shell
     for ftp_link, output_name in zip(ftp_list, output_names):
         wget_command = ['wget', '-O', output_name, ftp_link]
@@ -175,7 +177,7 @@ def wget_gunzip_fasta(ftp_list):
         subprocess.run(gunzip_command)
 
         LOGGER.info("Grabbed {}".format(output_name))
-
+    os.chdir('../')
 
 
 def parse_seqio_fasta(fasta_list, log_file):
