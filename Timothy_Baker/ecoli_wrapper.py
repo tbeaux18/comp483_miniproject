@@ -160,7 +160,7 @@ def wget_gunzip_fasta(ftp_list):
             None
     """
 
-    # fixed output names
+    # rename ncbi accession ids to common names
     output_names = ['HM27_FASTA.fna.gz', 'HM46_FASTA.fna.gz', \
                     'HM65_FASTA.fna.gz', 'HM69_FASTA.fna.gz', \
                     'hm27_feature.txt.gz', 'hm46_feature.txt.gz', \
@@ -172,7 +172,6 @@ def wget_gunzip_fasta(ftp_list):
         gunzip_command = ['gunzip', output_name]
 
         subprocess.run(wget_command)
-
         subprocess.run(gunzip_command)
 
         LOGGER.info("Grabbed {}".format(output_name))
@@ -290,6 +289,7 @@ def prefetch_fastq_decomp():
     # dependency files.
     sra_files = ['SRR1278956', 'SRR1278960', 'SRR1283106', 'SRR1278963']
 
+    # output directory names for fastq-dump; do not change
     fastq_dir_list = ['hm27_sra', 'hm46_sra', 'hm65_sra', 'hm69_sra']
 
     # prefetch places SRA files in $HOME/ncbi/public/sra
@@ -299,19 +299,16 @@ def prefetch_fastq_decomp():
         subprocess.run(['prefetch', sraf])
         LOGGER.info("Fetched {}".format(sraf))
 
+    # fastq-dump looks in $HOME/ncbi/public/sra
     for sra_file, fastq_out in zip(sra_files, fastq_dir_list):
 
         LOGGER.info("Decompressing {}".format(sra_file))
-
-        fq_command = "fastq-dump -I --split-files {} -O {}".format(sra_file, fastq_out)
-
         print("Decompressing {}".format(sra_file))
 
-        # fastq-dump looks in $HOME/ncbi/public/sra
+        fq_command = "fastq-dump -I --split-files {} -O {}".format(sra_file, fastq_out)
         subprocess.run(fq_command, shell=True)
 
         print("Decompression Complete")
-
         LOGGER.info("Finished {}".format(sra_file))
 
 
@@ -366,6 +363,7 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
         LOGGER.info("Copied {} file to {}.fa".format(fna_file, base_name))
         LOGGER.info("Built reference index for {}".format(base_name))
 
+
     LOGGER.info("Beginning tophat to perform alignment.")
     for gff_file, idx_base_name, trans_idx, tp_out_name, fastq_tup in zip(gff_list, \
                                                             idx_base_list, \
@@ -388,9 +386,9 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
         LOGGER.info("Alignment Complete")
 
+
     print("Sorting BAM files.")
     LOGGER.info("Beginning bam file sorting.")
-
     for bam_file, sorted_out_bam in zip(bam_file_list, sorted_bam_list):
 
         LOGGER.info("Sorting {}".format(bam_file))
@@ -431,19 +429,23 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf, th
 
     # building transcript assemblies with the sorted bam
     for gff_file, cuff_out, sorted_bam in zip(gff_list, cuff_out_list, sorted_bam_list):
-
         LOGGER.info("Assembling transcript for {}".format(cuff_out))
 
-        cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, gff_file, cuff_out, sorted_bam)
+        cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, \
+                                                                    gff_file, \
+                                                                    cuff_out, \
+                                                                    sorted_bam)
 
         subprocess.run(cufflink_command, shell=True)
         LOGGER.info("Assembly complete.")
+
 
     # merging each assembled transcriptome into 1 transcript
     LOGGER.info("Merging all assembled transcripts from each genome.")
     cuffmerge_command = "cuffmerge -p {} -o {} {}".format(threads, 'merged_ecoli', assembly_file)
     subprocess.run(cuffmerge_command, shell=True)
     LOGGER.info("Merging complete.")
+
 
     # normalizing the merged transcriptome against each of its sorted bam
     LOGGER.info("Normalizing the merged transcriptome.")
@@ -512,14 +514,13 @@ def main():
     LOGGER.info("Starting gene annotation with Prokka")
     build_prokka(fasta_file_list, log_file)
 
-    # # LOGGER.info("Grabbing SRA files and converting to FASTQ")
-    # # prefetch_fastq_decomp()
-    #
-    #
-    # LOGGER.info("Beginning alignment process.")
-    # build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
-    #                                             bam_file_list, sorted_bam_list, threads)
-    #
+    # LOGGER.info("Grabbing SRA files and converting to FASTQ")
+    # prefetch_fastq_decomp()
+
+    LOGGER.info("Beginning alignment process.")
+    build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, \
+                                                bam_file_list, sorted_bam_list, threads)
+
     LOGGER.info("Creating assembly file for cuffmerge.")
     with open('ecoli_assemblies.txt', 'w') as assemble_file:
         assemble_file.write("./hm27_cuff/transcripts.gtf\n")
