@@ -371,10 +371,10 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
     LOGGER.info("Beginning tophat to perform alignment.")
     for gff_file, trans_idx, idx_base_name in zip(trans_idx_list, gff_list, idx_base_list):
 
-        trans_idx_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
+        trans_idx_command = "tophat2 -G {} --transcriptome-index={} {}".format(gff_file, \
                                                                 trans_idx, idx_base_name)
         subprocess.run(trans_idx_command, shell=True)
-
+    sys.exit()
     for tp_out_name, trans_idx, idx_base_name, fastq_tup in zip(tophat_output_dir, gff_list, \
                                                                 idx_base_list, fastq_tuple_list):
 
