@@ -351,8 +351,8 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
     tophat_output_dir = ['hm27_tophat', 'hm46_tophat', 'hm65_tophat', 'hm69_tophat']
 
-    trans_idx_list = ['./transcriptome/hm27_index', './transcriptome/hm46_index', \
-    './transcriptome/hm65_index', './transcriptome/hm69_index']
+    trans_idx_list = ['transcriptome/hm27', 'transcriptome/hm46', \
+    'transcriptome/hm65', 'transcriptome/hm69']
     # Begins to build the bowtie2 index for each reference sample
     # Must make a copy of the fasta file into the same format as base name
     # for tophat2, but with the .fa file type, NOT .fna.
@@ -366,27 +366,26 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
         LOGGER.info("Copied {} file to {}.fa".format(fna_file, base_name))
         LOGGER.info("Built reference index for {}".format(base_name))
 
-    os.makedirs('./transcriptome/hm27_index')
-    os.makedirs('./transcriptome/hm46_index')
-    os.makedirs('./transcriptome/hm65_index')
-    os.makedirs('./transcriptome/hm69_index')
+    os.makedirs('./transcriptome/hm27')
+    os.makedirs('./transcriptome/hm46')
+    os.makedirs('./transcriptome/hm65')
+    os.makedirs('./transcriptome/hm69')
     LOGGER.info("Beginning tophat to perform alignment.")
-    for trans_idx, gff_file, idx_base_name, tp_out_name, fastq_tup in zip(trans_idx_list, gff_list, \
-                                                            idx_base_list, \
-                                                            tophat_output_dir, \
-                                                            fastq_tuple_list):
+    for gff_file, trans_idx, idx_base_name in zip(trans_idx_list, gff_list, idx_base_list):
 
         trans_idx_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
-                                                            trans_idx, \
-                                                            idx_base_name)
+                                                                trans_idx, idx_base_name)
+        subprocess.run(trans_idx_command, shell=True)
 
-        top_hat_command = "tophat2 -o {} -p {} --transcriptome-index={} {} {} {}".format(tp_out_name, threads, \
+    for tp_out_name, trans_idx, idx_base_name, fastq_tup in zip(tophat_output_dir, trans_idx_list, \
+                                                                idx_base_list, fastq_tuple_list):
+
+        top_hat_command = "tophat2 -p {} -o {} --transcriptome-index={} {} {} {}".format(threads, tp_out_name, \
                                                                         trans_idx, idx_base_name, \
                                                                         fastq_tup[0], fastq_tup[1])
 
         LOGGER.info("Aligning {}".format(idx_base_name))
 
-        subprocess.run(trans_idx_command, shell=True)
         subprocess.run(top_hat_command, shell=True)
 
         LOGGER.info("Alignment Complete")
