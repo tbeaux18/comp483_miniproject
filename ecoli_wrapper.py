@@ -84,10 +84,10 @@ HM46_FASTA = './ncbi_fasta/HM46_FASTA.fna'
 HM65_FASTA = './ncbi_fasta/HM65_FASTA.fna'
 HM69_FASTA = './ncbi_fasta/HM69_FASTA.fna'
 
-HM27_GFF_FILE = './hm27_index.gff'
-HM46_GFF_FILE = './hm46_index.gff'
-HM65_GFF_FILE = './hm65_index.gff'
-HM69_GFF_FILE = './hm69_index.gff'
+HM27_GFF_FILE = './prokka_hm27/hm27_index.gff'
+HM46_GFF_FILE = './prokka_hm46/hm46_index.gff'
+HM65_GFF_FILE = './prokka_hm65/hm65_index.gff'
+HM69_GFF_FILE = './prokka_hm69/hm69_index.gff'
 
 HM27_BAM = './hm27_tophat/accepted_hits.bam'
 HM46_BAM = './hm46_tophat/accepted_hits.bam'
@@ -369,18 +369,16 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
 
 
     LOGGER.info("Beginning tophat to perform alignment.")
-    # for gff_file, trans_idx, idx_base_name in zip(trans_idx_list, gff_list, idx_base_list):
-    #
-    #     trans_idx_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
-    #                                                             trans_idx, idx_base_name)
-    #     subprocess.run(trans_idx_command, shell=True)
+    for gff_file, trans_idx, idx_base_name in zip(trans_idx_list, gff_list, idx_base_list):
 
-    for tp_out_name, gff_file, idx_base_name, fastq_tup in zip(tophat_output_dir, gff_list, \
+        trans_idx_command = "tophat -G {} --transcriptome-index={} {}".format(gff_file, \
+                                                                trans_idx, idx_base_name)
+        subprocess.run(trans_idx_command, shell=True)
+
+    for tp_out_name, trans_idx, idx_base_name, fastq_tup in zip(tophat_output_dir, gff_list, \
                                                                 idx_base_list, fastq_tuple_list):
 
-        top_hat_command = "tophat2 -p {} -o {} -G {} {} {} {}".format(threads, tp_out_name, \
-                                                                        gff_file, idx_base_name, \
-                                                                        fastq_tup[0], fastq_tup[1])
+        top_hat_command = "tophat2 -p {} -o {} --transcriptome-index={} {} {} {}".format(threads, tp_out_name, trans_idx, idx_base_name, fastq_tup[0], fastq_tup[1])
 
         LOGGER.info("Aligning {}".format(idx_base_name))
 
