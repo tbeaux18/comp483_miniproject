@@ -358,23 +358,43 @@ def build_tophat_alignment(fasta_file_list, gff_list, fastq_tuple_list, bam_file
     # Must make a copy of the fasta file into the same format as base name
     # for tophat2, but with the .fa file type, NOT .fna.
     LOGGER.info("Beginning bowtie2 to build reference index.")
-    for fna_file, base_name in zip(fasta_file_list, idx_base_list):
+    # for fna_file, base_name in zip(fasta_file_list, idx_base_list):
 
-        bwt2_command = "bowtie2-build --threads {} -f {} {}".format(threads, fna_file, base_name)
-        copy_command = "cp {} {}.fa".format(fna_file, base_name)
+
+    for gff_file, trans_idx, idx_base_name, fna_file in zip(gff_list, trans_idx_list, idx_base_list, fasta_file_list):
+
+        trans_idx_command = "tophat2 -G {} --transcriptome-index={} {}".format(gff_file, trans_idx, idx_base_name)
+
+        bwt2_command = "bowtie2-build --threads {} -f {} {}".format(threads, fna_file, idx_base_name)
+
+        copy_fasta = "cp {} ./transcriptome/{}.fa".format(fna_file, idx_base_name)
+
+        move_bt2 = "mv *.bt2 ./transcriptome"
+
+        LOGGER.info("Building transcriptomic index.")
+        subprocess.run(trans_idx_command, shell=True)
+
+        LOGGER.info("Building genomic index.")
         subprocess.run(bwt2_command, shell=True)
-        subprocess.run(copy_command, shell=True)
-        LOGGER.info("Copied {} file to {}.fa".format(fna_file, base_name))
-        LOGGER.info("Built reference index for {}".format(base_name))
+
+        LOGGER.info("Copying fasta file to transcriptome directory.")
+        subprocess.run(copy_fasta, shell=True)
+
+        LOGGER.info("Moving all bowtie2 files to transcriptome directory.")
+        subprocess.run(move_bt2, shell=True)
+
+        LOGGER.info("Copied {} file to {}.fa".format(fna_file, idx_base_name))
+        LOGGER.info("Built reference index for {}".format(idx_base_name))
 
 
     LOGGER.info("Beginning tophat to perform alignment.")
-    for gff_file, trans_idx, idx_base_name in zip(gff_list, trans_idx_list, idx_base_list):
-
-        trans_idx_command = "tophat2 -G {} --transcriptome-index={} {}".format(gff_file, \
-                                                                trans_idx, idx_base_name)
-        subprocess.run(trans_idx_command, shell=True)
-
+    # for gff_file, trans_idx, idx_base_name in zip(gff_list, trans_idx_list, idx_base_list):
+    #
+    #     trans_idx_command = "tophat2 -G {} --transcriptome-index={} {}".format(gff_file, \
+    #                                                             trans_idx, idx_base_name)
+    #     subprocess.run(trans_idx_command, shell=True)
+    #
+    #
     for tp_out_name, trans_idx, idx_base_name, fastq_tup in zip(tophat_output_dir, trans_idx_list, \
                                                                     idx_base_list, fastq_tuple_list):
 
