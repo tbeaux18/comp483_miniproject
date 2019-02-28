@@ -259,10 +259,10 @@ def build_prokka(fasta_list, log_file):
         LOGGER.info("Copying {}.txt contents to log file".format(genome_name))
 
         # copies prokka output text file to log file
-        with open(txt_prokka_output, 'r') as txt_file:
-            log_file.write("\n{} annotation\n".format(output_dir))
-            for line in txt_file:
-                log_file.write(str(line))
+        # with open(txt_prokka_output, 'r') as txt_file:
+        #     log_file.write("\n{} annotation\n".format(output_dir))
+        #     for line in txt_file:
+        #         log_file.write(str(line))
 
 
 
