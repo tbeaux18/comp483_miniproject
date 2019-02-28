@@ -434,7 +434,8 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf, th
     """
 
     # array of top level directory for cufflink output files
-    cuff_out_list = ['hm27_cuff', 'hm46_cuff', 'hm65_cuff', 'hm69_cuff']
+    # cuff_out_list = ['hm27_cuff', 'hm46_cuff', 'hm65_cuff', 'hm69_cuff']
+    cuff_out_list = ['hm27_cuff', 'hm46_cuff', 'hm65_cuff']
 
     # building transcript assemblies with the sorted bam
     for gff_file, cuff_out, sorted_bam in zip(gff_list, cuff_out_list, sorted_bam_list):
@@ -457,11 +458,15 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf, th
 
     # normalizing the merged transcriptome against each of its sorted bam
     LOGGER.info("Normalizing the merged transcriptome.")
-    cuffnorm_command = "cuffnorm -o diff_results -p {} {} {} {} {} {}".format(threads, merged_gtf, \
+    cuffnorm_command = "cuffnorm -o diff_results -p {} {} {} {} {}".format(threads, merged_gtf, \
                                                                     sorted_bam_list[0], \
                                                                     sorted_bam_list[1], \
-                                                                    sorted_bam_list[2], \
-                                                                    sorted_bam_list[3])
+                                                                    sorted_bam_list[2])
+    # cuffnorm_command = "cuffnorm -o diff_results -p {} {} {} {} {} {}".format(threads, merged_gtf, \
+    #                                                                 sorted_bam_list[0], \
+    #                                                                 sorted_bam_list[1], \
+    #                                                                 sorted_bam_list[2], \
+    #                                                                 sorted_bam_list[3])
 
     subprocess.run(cuffnorm_command, shell=True)
     LOGGER.info("Normalization complete.")
@@ -503,10 +508,12 @@ def main():
                         (HM69_FASTQ_1, HM69_FASTQ_2)]
 
     # output from prokka software
-    gff_list = [HM27_GFF_FILE, HM46_GFF_FILE, HM65_GFF_FILE, HM69_GFF_FILE]
+    #gff_list = [HM27_GFF_FILE, HM46_GFF_FILE, HM65_GFF_FILE, HM69_GFF_FILE]
+    gff_list = [HM27_GFF_FILE, HM46_GFF_FILE, HM65_GFF_FILE]
 
     # output from tophat2
-    bam_file_list = [HM27_BAM, HM46_BAM, HM65_BAM, HM69_BAM]
+    #bam_file_list = [HM27_BAM, HM46_BAM, HM65_BAM, HM69_BAM]
+    bam_file_list = [HM27_BAM, HM46_BAM, HM65_BAM]
 
     # output from samtools sort and tophat2
     sorted_bam_list = [HM27_SORTED_BAM, HM46_SORTED_BAM, HM65_SORTED_BAM, HM69_SORTED_BAM]
@@ -537,7 +544,7 @@ def main():
         assemble_file.write("./hm27_cuff/transcripts.gtf\n")
         assemble_file.write("./hm46_cuff/transcripts.gtf\n")
         assemble_file.write("./hm65_cuff/transcripts.gtf\n")
-        assemble_file.write("./hm69_cuff/transcripts.gtf\n")
+        #assemble_file.write("./hm69_cuff/transcripts.gtf\n")
 
     LOGGER.info("Beginning to run cufflinks")
     run_cufflinks_suite(gff_list, bam_file_list, 'ecoli_assemblies.txt', MERGED_GTF, threads)
