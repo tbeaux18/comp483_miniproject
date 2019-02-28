@@ -35,6 +35,9 @@ Dependencies:
         cuffnorm
     Biopython
 
+NEED TO CHANGE THE STRUCTURE OF THIS TO BREAK IT OUT INTO MORE RE-USABLE FUNCTIONS
+PUT THESE TEST FILES IN A SEPARATE FILE TO READ IN!
+TRY TO NAVIGATE THE DIRECTORIES MORE
 """
 
 import os
@@ -393,16 +396,16 @@ def build_tophat_alignment(fasta_file_list, fastq_tuple_list, bam_file_list, sor
         LOGGER.info("Alignment Complete")
 
 
-    print("Sorting BAM files.")
-    LOGGER.info("Beginning bam file sorting.")
-    for bam_file, sorted_out_bam in zip(bam_file_list, sorted_bam_list):
-
-        LOGGER.info("Sorting {}".format(bam_file))
-
-        sort_bam_command = "samtools sort {} -o {}".format(bam_file, sorted_out_bam)
-        subprocess.run(sort_bam_command, shell=True)
-
-        LOGGER.info("Finished sorting {}".format(sorted_out_bam))
+    # print("Sorting BAM files.")
+    # LOGGER.info("Beginning bam file sorting.")
+    # for bam_file, sorted_out_bam in zip(bam_file_list, sorted_bam_list):
+    #
+    #     LOGGER.info("Sorting {}".format(bam_file))
+    #
+    #     sort_bam_command = "samtools sort {} -o {}".format(bam_file, sorted_out_bam)
+    #     subprocess.run(sort_bam_command, shell=True)
+    #
+    #     LOGGER.info("Finished sorting {}".format(sorted_out_bam))
 
 
 
@@ -437,11 +440,11 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf, th
     for gff_file, cuff_out, sorted_bam in zip(gff_list, cuff_out_list, sorted_bam_list):
         LOGGER.info("Assembling transcript for {}".format(cuff_out))
 
-        cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, \
-                                                                    gff_file, \
-                                                                    cuff_out, \
-                                                                    sorted_bam)
-
+        cufflink_command = "cufflinks -p {} -o {} {}".format(threads, cuff_out, sorted_bam)
+        # cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, \
+        #                                                             gff_file, \
+        #                                                             cuff_out, \
+        #                                                             sorted_bam)
         subprocess.run(cufflink_command, shell=True)
         LOGGER.info("Assembly complete.")
 
@@ -519,15 +522,16 @@ def main():
 
     # NEED TO FIX THE DIRECTORY PATH FOR WRITING TO THE LOG FILE!!
 
+    # fix prokka to use less cpus and add the -usegenus flag
     # LOGGER.info("Starting gene annotation with Prokka")
     # build_prokka(fasta_file_list, log_file)
 
     # LOGGER.info("Grabbing SRA files and converting to FASTQ")
     # prefetch_fastq_decomp()
 
-    LOGGER.info("Beginning alignment process.")
-    build_tophat_alignment(fasta_file_list, fastq_tuple_list, bam_file_list, \
-                                                        sorted_bam_list, threads)
+    # LOGGER.info("Beginning alignment process.")
+    # build_tophat_alignment(fasta_file_list, fastq_tuple_list, bam_file_list, \
+    #                                                     sorted_bam_list, threads)
 
     LOGGER.info("Creating assembly file for cuffmerge.")
     with open('ecoli_assemblies.txt', 'w') as assemble_file:
@@ -537,7 +541,7 @@ def main():
         assemble_file.write("./hm69_cuff/transcripts.gtf\n")
 
     LOGGER.info("Beginning to run cufflinks")
-    run_cufflinks_suite(gff_list, sorted_bam_list, 'ecoli_assemblies.txt', MERGED_GTF, threads)
+    run_cufflinks_suite(gff_list, bam_file_list, 'ecoli_assemblies.txt', MERGED_GTF, threads)
 
     LOGGER.info("Pipeline Complete.")
     log_file.close()
