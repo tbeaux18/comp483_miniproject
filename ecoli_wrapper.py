@@ -93,8 +93,8 @@ HM69_GFF_FILE = './prokka_hm69/hm69_index.gff'
 
 HM27_BAM = './hm27_tophat/accepted_hits.bam'
 HM46_BAM = './hm46_tophat/accepted_hits.bam'
-HM65_BAM = './hm65_tophat/accepted_hits.reheader.bam'
-HM69_BAM = './hm69_tophat/accepted_hits.reheader.bam'
+HM65_BAM = './hm65_tophat/accepted_hits.bam'
+HM69_BAM = './hm69_tophat/accepted_hits.bam'
 
 HM27_SORTED_BAM = './hm27_tophat/accepted_hits.sorted.bam'
 HM46_SORTED_BAM = './hm46_tophat/accepted_hits.sorted.bam'
