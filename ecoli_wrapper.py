@@ -93,8 +93,8 @@ HM69_GFF_FILE = './prokka_hm69/hm69_index.gff'
 
 HM27_BAM = './hm27_tophat/accepted_hits.bam'
 HM46_BAM = './hm46_tophat/accepted_hits.bam'
-HM65_BAM = './hm65_tophat/accepted_hits.bam'
-HM69_BAM = './hm69_tophat/accepted_hits.bam'
+HM65_BAM = './hm65_tophat/accepted_hits.reheader.bam'
+HM69_BAM = './hm69_tophat/accepted_hits.reheader.bam'
 
 HM27_SORTED_BAM = './hm27_tophat/accepted_hits.sorted.bam'
 HM46_SORTED_BAM = './hm46_tophat/accepted_hits.sorted.bam'
@@ -516,8 +516,8 @@ def main():
     # wget_gunzip_fasta(fasta_ftp_list)
 
     # Parsing the FASTA and counting number of contigs and base pairs > 1000 in length
-    LOGGER.info("Parsing FASTA and writing to log file.")
-    parse_seqio_fasta(fasta_file_list, log_file)
+    # LOGGER.info("Parsing FASTA and writing to log file.")
+    # parse_seqio_fasta(fasta_file_list, log_file)
 
     # NEED TO FIX THE DIRECTORY PATH FOR WRITING TO THE LOG FILE!!
 
