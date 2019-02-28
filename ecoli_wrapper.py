@@ -440,11 +440,10 @@ def run_cufflinks_suite(gff_list, sorted_bam_list, assembly_file, merged_gtf, th
     for gff_file, cuff_out, sorted_bam in zip(gff_list, cuff_out_list, sorted_bam_list):
         LOGGER.info("Assembling transcript for {}".format(cuff_out))
 
-        cufflink_command = "cufflinks -p {} -o {} {}".format(threads, cuff_out, sorted_bam)
-        # cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, \
-        #                                                             gff_file, \
-        #                                                             cuff_out, \
-        #                                                             sorted_bam)
+        cufflink_command = "cufflinks -p {} -G {} -o {} {}".format(threads, \
+                                                                    gff_file, \
+                                                                    cuff_out, \
+                                                                    sorted_bam)
         subprocess.run(cufflink_command, shell=True)
         LOGGER.info("Assembly complete.")
 
