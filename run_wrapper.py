@@ -47,8 +47,25 @@ def main():
     ftp_to_path = CURRENT_DIR + '/Timothy_Baker_tests/' + ftp_files
     sra_to_path = CURRENT_DIR + '/Timothy_Baker_tests/' + sra_file
 
+    parse_fasta_path = CURRENT_DIR + '/parse_fasta.py'
+    fastq_dump_path = CURRENT_DIR + '/fastq_dump.py'
+    prokka_path = CURRENT_DIR + '/prokka.py'
+    tophat2_path = CURRENT_DIR + '/tophat2.py'
+    cufflinks_path = CURRENT_DIR + '/cufflinks.py'
+
+    parse_fasta_to_path = CURRENT_DIR + '/Timothy_Baker_tests/parse_fasta.py'
+    fastq_dump_to_path = CURRENT_DIR + '/Timothy_Baker_tests/fastq_dump.py'
+    prokka_to_path = CURRENT_DIR + '/Timothy_Baker_tests/prokka.py'
+    tophat2_to_path = CURRENT_DIR + '/Timothy_Baker_tests/tophat2.py'
+    cufflinks_to_path = CURRENT_DIR + '/Timothy_Baker_tests/cufflinks.py'
+
     os.rename(ftp_path, ftp_to_path)
     os.rename(sra_path, sra_to_path)
+    os.rename(parse_fasta_path, parse_fasta_to_path)
+    os.rename(fastq_dump_path, fastq_dump_to_path)
+    os.rename(prokka_path, prokka_to_path)
+    os.rename(tophat2_path, tophat2_to_path)
+    os.rename(cufflinks_path, cufflinks_to_path)
 
 
     with open(ftp_files, 'r') as ftp_input:
