@@ -158,13 +158,13 @@ def main():
 
     run_prokka(fasta_file, output_dir, prefix_name)
 
-    count = cds_trna_difference(prokka_file, refseq_file)
+    # count = cds_trna_difference(prokka_file, refseq_file)
 
-    write_output_tmp(count, assembly_name)
-
-    copy_prokka_text('tmp', 'UPEC')
-
-    copy_prokka_text(prokka_file, 'UPEC')
+    # write_output_tmp(count, assembly_name)
+    #
+    # copy_prokka_text('tmp', 'UPEC')
+    #
+    # copy_prokka_text(prokka_file, 'UPEC')
 
 
 if __name__ == '__main__':
