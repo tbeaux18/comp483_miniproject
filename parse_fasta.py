@@ -5,13 +5,20 @@
 
 """
 
+
+ #  ______       _____ _______
+ # |  ____/\    / ____|__   __|/\
+ # | |__ /  \  | (___    | |  /  \
+ # |  __/ /\ \  \___ \   | | / /\ \
+ # | | / ____ \ ____) |  | |/ ____ \
+ # |_|/_/    \_\_____/   |_/_/    \_\
+ #
+
+
 import os
 import argparse
 import subprocess
 from Bio import SeqIO
-
-
-
 
 
 def arg_parser():
@@ -23,16 +30,6 @@ def arg_parser():
     parser.add_argument('-f', '--ftp_file', help='path to text file that has ftp links')
 
     return parser.parse_args()
-
-
- #  ______       _____ _______
- # |  ____/\    / ____|__   __|/\
- # | |__ /  \  | (___    | |  /  \
- # |  __/ /\ \  \___ \   | | / /\ \
- # | | / ____ \ ____) |  | |/ ____ \
- # |_|/_/    \_\_____/   |_/_/    \_\
- #
-
 
 
 def wget_gunzip_fasta(output_name, ftp_link):
@@ -89,27 +86,47 @@ def parse_seqio_fasta(fasta_file, assembly_name):
     return None
 
 
-
-def main():
-
-    args = arg_parser()
-
-    ftp_files = args.ftp_file
-
+def builds_fasta_run(ftp_files):
+    """ builds the run and begins the pipeline first
+        Args:
+            ftp_files (str) : path to FTP file; must be in specified format
+        Returns:
+            None
+    """
+    # ftp input must be in specified format, no error handling present
     with open(ftp_files, 'r') as input_ftp:
         for line in input_ftp:
+
+            # keeps files all together
             input_line = line.strip().split(',')
 
+            # creates the output names for gunzip
             zipped_fasta_output_name = input_line[0] + '_FASTA.fna.gz'
             zipped_feature_output_name = input_line[0] + '_FEAT.fna.gz'
 
+            # downloads and unzips both the fasta and feature file
             wget_gunzip_fasta(zipped_fasta_output_name, input_line[1])
             wget_gunzip_fasta(zipped_feature_output_name, input_line[2])
 
+            # builds the the fasta path
             fasta_file = "./ncbi_fasta/{}_FASTA.fna".format(input_line[0])
 
+            # does the parsing and initializes the UPEC log
+            # and outputs the results
             parse_seqio_fasta(fasta_file, input_line[0])
 
+
+def main():
+    """ runs main script """
+
+    # sets parser
+    args = arg_parser()
+
+    # sets ftp input file
+    ftp_files = args.ftp_file
+
+    # begins the download and parsing
+    builds_fasta_run(ftp_files)
 
 
 

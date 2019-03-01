@@ -3,11 +3,17 @@
 @author: Timothy Baker
 @version: 1.0.0
 
-
 tophat2.py
 
-
 """
+
+ #  _______ ____  _____  _    _       _______
+ # |__   __/ __ \|  __ \| |  | |   /\|__   __|
+ #    | | | |  | | |__) | |__| |  /  \  | |
+ #    | | | |  | |  ___/|  __  | / /\ \ | |
+ #    | | | |__| | |    | |  | |/ ____ \| |
+ #    |_|  \____/|_|    |_|  |_/_/    \_\_|
+ #
 
 
 import argparse
@@ -22,29 +28,23 @@ def arg_parser():
     )
     parser.add_argument('-s', '--sra_file', help='sra accession id')
     parser.add_argument('-t', '--threads', help='number of threads to use')
-    parser.add_argument('-n', '--nargs', nargs='+')
     return parser.parse_args()
 
 
 
 def build_tophat_alignment(fasta_file, idx_name, fastq1, fastq2, output_dir, threads):
-    """ main tophat/bowtie2 build. requires that the reference fasta files that were found
-        are indexed by bowtie2. Once indexed by bowtie2, tophat will create a transcriptome
-        index that is used for alignment. After that is built, tophat2 will perform the
-        alignment ~ 3-4 hours. Once each alignment is performed, samtools is called to
-        sort each bam in the same fashion and outputs file.sorted.bam file.
+    """ builds tophat alignment and runs the command. Only works for PE reads
         Tools:
             bowtie2 : for indexing reference
             tophat2 : builds transcriptome index and performs RNA-seq alignment
             samtools : sorts the bams for downstream analysis
         Args:
-            fasta_file_list (lst) : array of paths to fasta files
-            gff_list (lst) : array of paths to gff files from prokka
-            fastq_tuple_list (tup/lst) : holds the paths to fastq1 and fastq 2
-                        from fastq dump
-            bam_file_list (lst) : array of paths to where the bams will be located
-                                    after alignment
-            sorted_bam_list (lst) : array of path names for sorted bams after samtools
+            fasta_file (str) : path to fasta
+            idx_name (str) : base name
+            fastq1 (str) : path to fastq1
+            fastq2 (str) : path to fastq2
+            output_dir (str) : output directory
+            threads (int) : number of threads to run on
         Returns:
             None
     """
@@ -52,8 +52,6 @@ def build_tophat_alignment(fasta_file, idx_name, fastq1, fastq2, output_dir, thr
     # Begins to build the bowtie2 index for each reference sample
     # Must make a copy of the fasta file into the same format as base name
     # for tophat2, but with the .fa file type, NOT .fna.
-
-
     bwt2_command = "bowtie2-build --threads {} -f {} {}".format(threads, \
                                                                     fasta_file, \
                                                                     idx_name)
@@ -75,27 +73,55 @@ def build_tophat_alignment(fasta_file, idx_name, fastq1, fastq2, output_dir, thr
 
 
 def build_tophat_run(sra_file, threads):
+    """ builds the top hat run and builds the paths
+        Args:
+            sra_file (str) : input file
+            threads (int) : threads to use
+        Returns:
+            None
+    """
 
     with open(sra_file, 'r') as sra_ids:
         for line in sra_ids:
+
+            # creates a list
             new_line = line.strip().split(',')
+
+            # strain name is first; specified in input instruction
             assembly_name = new_line[0]
+
+            # requires the SRA file accession ID; usually begins with SSR
             sra_acc_id = new_line[1]
+
+            # builds the fasta_file path name
             fasta_file = './ncbi_fasta/' + assembly_name + '_FASTA.fna'
+
+            # builds the output directory name using strain name
             output_dir = assembly_name + '_tophat'
+
+            # builds the index base name for bowtie2
             idx_name = assembly_name + '_index'
+
+            # builds the fastq files that are located in the _sra direcotry
             fastq_1 = './' + assembly_name + '_sra/' + sra_acc_id + '_1.fastq'
             fastq_2 = './' + assembly_name + '_sra/' + sra_acc_id + '_2.fastq'
 
+            # runs the software
             build_tophat_alignment(fasta_file, idx_name, fastq_1, fastq_2, output_dir, threads)
 
+
 def main():
+    """ runs the main script """
+
+    # set args
     args = arg_parser()
 
-    nargs = args.nargs
+    # sra file is needed in specified format
     sra_file = args.sra_file
     threads = args.threads
 
+    # runs the build; no error handling available.
+    # takes roughly 3-4 hours per genome
     build_tophat_run(sra_file, threads)
 
 if __name__ == '__main__':

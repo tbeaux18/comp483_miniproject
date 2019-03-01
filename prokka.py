@@ -33,15 +33,27 @@ def arg_parser():
 
 
 def run_prokka(fasta_file, prefix_name, output_dir):
+    """ runs the prokka software pipeline; UPEC log must be created for
+        logging of the command.
+        Args:
+            fasta_file (str) : path to fasta file
+            prefix_name (str) : assembly_name_index
+            output_dir (str) : assembly_name_prokout
+        Returns:
+            None
+    """
 
     prokka_cmd = "prokka --outdir {} --prefix {} {} --genus Escherichia --usegenus".format(output_dir, \
                                                                                     prefix_name, \
                                                                                     fasta_file)
     subprocess.run(prokka_cmd, shell=True)
 
+    with open('UPEC.log', 'a') as output_prokka_command:
+        output_prokka_command.write(str(prokka_cmd))
 
 
 def copy_prokka_text(prefix_name, log_file_name):
+    """ takes a tmp file and copies to log using bash """
 
     copy_cmd = "cat {}.txt >> {}.log".format(prefix_name, log_file_name)
 
@@ -79,6 +91,13 @@ def grep_count(word, input_file):
 
 
 def cds_trna_difference(prokka_file, refseq_file):
+    """ calculates the difference between prokka output and refseq feature
+        Args:
+            prokka_file (file) : path to file
+            refseq_file (file) : path to file
+        Returns:
+            result_dict.values() [CDS, tRNA]
+    """
 
     prokka_dict_count = {'\tCDS\t':0, '\ttRNA\t':0}
     refseq_dict_count = {'\tCDS\t':0, '\ttRNA\t':0}
@@ -107,6 +126,13 @@ def cds_trna_difference(prokka_file, refseq_file):
 
 
 def write_output_tmp(count, name):
+    """ writes to a tmp file so we can append output into the UPEC logself.
+        Args:
+            count (lst) : lst of counts [CDS, tRNA]
+            name (str) : assembly name
+        Returns:
+            None
+    """
 
     with open('tmp.txt', 'w') as tmp_file:
 
@@ -134,6 +160,13 @@ def write_output_tmp(count, name):
 
 
 def build_prokka_run(assembly_name_list):
+    """ assembles and sets all the file names and bgins to run the module.
+        Args:
+            assembly_name_list (lst) : list of assembly names
+        Returns:
+            None
+    """
+
     for assembly_name in assembly_name_list:
 
         fasta_file = './ncbi_fasta/' + assembly_name + '_FASTA.fna'
@@ -153,11 +186,15 @@ def build_prokka_run(assembly_name_list):
         copy_prokka_text(prokka_file, 'UPEC')
 
 def main():
+    """ runs mains script """
 
+    # sets parser
     args = arg_parser()
 
+    # assembly must be in list format
     assembly_nargs = args.nargs
 
+    # runs the build; no error handling available
     build_prokka_run(assembly_nargs)
 
 

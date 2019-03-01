@@ -9,11 +9,28 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+SRA Input File:
+The format is very important since the parsers need this exact format and there is no error handling around this.
+```
+<Strain_name>,<SRA_Accession_ID>
+```
 
+Example:
 ```
-Give examples
+HM27,SRR1278956
 ```
+
+FTP Input File:
+The format is very important since the parsers need this exact format and there is no error handling around this.
+```
+<Strain_name>,<FTP link for fasta .fna.gz>,<FTP link for feature file .txt.gz>\n
+```
+
+Example:
+```
+HM27,ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_genomic.fna.gz,ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_feature_count.txt.gz
+```
+
 
 ### Installing
 
