@@ -20,11 +20,9 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description='RNA-seq python wrapper for 4 E.Coli genomes.\n'
     )
-    parser.add_argument('-a', '--assembly_name', help='base name of the strain file from prokka.')
-    parser.add_argument('-f', '--fasta_file', help='path to fasta file.')
     parser.add_argument('-s', '--sra_file', help='sra accession id')
     parser.add_argument('-t', '--threads', help='number of threads to use')
-
+    parser.add_argument('-n', '--nargs', nargs='+')
     return parser.parse_args()
 
 
@@ -94,6 +92,7 @@ def build_tophat_run(sra_file, threads):
 def main():
     args = arg_parser()
 
+    nargs = args.nargs
     sra_file = args.sra_file
     threads = args.threads
 

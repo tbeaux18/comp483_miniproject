@@ -27,10 +27,7 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description='RNA-seq python wrapper for 4 E.Coli genomes.\n'
     )
-    parser.add_argument('-a', '--assembly_name', help='base name of the strain file from prokka.')
-    parser.add_argument('-f', '--fasta_file', help='path to fasta file.')
-    parser.add_argument('-r', '--refseq_file', help='path to refseq feature file.')
-
+    parser.add_argument('-n', '--nargs', nargs='+')
     return parser.parse_args()
 
 
@@ -159,9 +156,9 @@ def main():
 
     args = arg_parser()
 
-    assembly_name_list = args.assembly_name
+    assembly_nargs = args.nargs
 
-    build_prokka_run(assembly_name_list)
+    build_prokka_run(assembly_nargs)
 
 
 if __name__ == '__main__':

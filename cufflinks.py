@@ -27,7 +27,7 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description='RNA-seq python wrapper for 4 E.Coli genomes.\n'
     )
-    parser.add_argument('-a', '--assembly_name', help='base name of the strain file from prokka.')
+    parser.add_argument('-n', '--nargs', nargs='+')
     parser.add_argument('-t', '--threads', help='path to fasta file.')
 
     return parser.parse_args()
@@ -71,11 +71,10 @@ def main():
 
     args = arg_parser()
 
-    assembly_name_list = args.assembly_name
-
+    nargs = args.nargs
     threads = args.threads
 
-    build_cuff_run(assembly_name_list, threads)
+    build_cuff_run(nargs, threads)
 
     run_cuffmerge(threads, 'assemblies.txt')
 
