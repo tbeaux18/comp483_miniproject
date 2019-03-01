@@ -44,9 +44,11 @@ def main():
 
     ftp_path = CURRENT_DIR + '/' + ftp_files
     sra_path = CURRENT_DIR + '/' + sra_file
+    ftp_to_path = CURRENT_DIR + '/Timothy_Baker_tests/' + ftp_files
+    sra_to_path = CURRENT_DIR + '/Timothy_Baker_tests/' + sra_file
 
-    os.rename(ftp_path, './Timothy_Baker_tests/' + ftp_files)
-    os.rename(sra_path, './Timothy_Baker_tests/' + sra_file)
+    os.rename(ftp_path, ftp_to_path)
+    os.rename(sra_path, sra_to_path)
 
 
     with open(ftp_files, 'r') as ftp_input:
