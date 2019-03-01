@@ -35,16 +35,12 @@ def arg_parser():
 
 
 
-def run_prokka(fasta_file, output_dir, prefix_name):
+def run_prokka(fasta_file, prefix_name, output_dir):
 
-    prokka_cmd = "prokka --outdir {} --prefix {} {} --genus Escherichia".format(output_dir, \
+    prokka_cmd = "prokka --outdir {} --prefix {} {} --genus Escherichia --usegenus".format(output_dir, \
                                                                                     prefix_name, \
                                                                                     fasta_file)
-    # args = shlex.split(prokka_cmd)
-
     subprocess.run(prokka_cmd, shell=True)
-
-
 
 
 
@@ -140,28 +136,32 @@ def write_output_tmp(count, name):
     return None
 
 
+def build_prokka_run(assembly_name_list):
+    for assembly_name in assembly_name_list:
+
+        fasta_file = './ncbi_fasta/' + assembly_name + '_FASTA.fna'
+        prefix_name = assembly_name + '_index'
+        output_dir = assembly_name + '_prokout'
+        prokka_file = './' + output_dir + '/' + prefix_name + '.gff'
+        refseq_file = './ncbi_fasta/' + assembly_name + '_FEAT.fna'
+
+        run_prokka(fasta_file, prefix_name, output_dir)
+
+        count = cds_trna_difference(prokka_file, refseq_file)
+
+        write_output_tmp(count, assembly_name)
+
+        copy_prokka_text('tmp', 'UPEC')
+
+        copy_prokka_text(prokka_file, 'UPEC')
+
 def main():
 
     args = arg_parser()
 
-    assembly_name = args.assembly_name
-    fasta_file = args.fasta_file
-    refseq_file = args.refseq_file
+    assembly_name_list = args.assembly_name
 
-    prefix_name = assembly_name + '_index'
-    output_dir = assembly_name + '_prokout'
-    prokka_file = './' + output_dir + '/' + prefix_name + '.gff'
-
-
-    run_prokka(fasta_file, output_dir, prefix_name)
-
-    count = cds_trna_difference(prokka_file, refseq_file)
-
-    write_output_tmp(count, assembly_name)
-
-    copy_prokka_text('tmp', 'UPEC')
-
-    copy_prokka_text(prokka_file, 'UPEC')
+    build_prokka_run(assembly_name_list)
 
 
 if __name__ == '__main__':
