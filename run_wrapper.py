@@ -32,7 +32,7 @@ def arg_parser():
 
 
 def main():
-
+    print(CURRENT_DIR)
     args = arg_parser()
 
     threads = args.threads
