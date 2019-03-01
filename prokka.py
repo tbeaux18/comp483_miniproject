@@ -49,7 +49,7 @@ def run_prokka(fasta_file, prefix_name, output_dir):
     subprocess.run(prokka_cmd, shell=True)
 
     with open('UPEC.log', 'a') as output_prokka_command:
-        output_prokka_command.write(str(prokka_cmd))
+        output_prokka_command.write('\n'+str(prokka_cmd))
 
 
 def copy_prokka_text(prefix_name, log_file_name):
