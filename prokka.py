@@ -181,7 +181,7 @@ def build_prokka_run(assembly_name_list):
         with open(prokka_text, 'r') as input_file:
             with open('UPEC.log', 'a') as output_file:
                 for line in input_file:
-                    output_file.write('\n' + line + '\n')
+                    output_file.write(line + '\n')
 
 def main():
     """ runs mains script """
