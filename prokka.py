@@ -42,7 +42,7 @@ def run_prokka(fasta_file, output_dir, prefix_name):
                                                                                     fasta_file)
     args = shlex.split(prokka_cmd)
 
-    subprocess.run(args, stdout=subprocess.PIPE, \
+    subprocess.run(args, shell=True, stdout=subprocess.PIPE, \
                                 stderr=subprocess.PIPE, universal_newlines=True)
     #
     # prokka_communicate = prokka_run.communicate()
