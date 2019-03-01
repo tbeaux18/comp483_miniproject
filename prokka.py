@@ -40,14 +40,12 @@ def run_prokka(fasta_file, output_dir, prefix_name):
     prokka_cmd = "prokka --outdir {} --prefix {} {} --genus Escherichia".format(output_dir, \
                                                                                     prefix_name, \
                                                                                     fasta_file)
-    args = shlex.split(prokka_cmd)
+    # args = shlex.split(prokka_cmd)
 
-    prokka_run = subprocess.Popen(args, stdout=subprocess.PIPE, \
+    subprocess.run(prokka_cmd, shell=True, stdout=subprocess.PIPE, \
                                 stderr=subprocess.PIPE, universal_newlines=True)
 
-    prokka_communicate = prokka_run.communicate()
 
-    return prokka_communicate
 
 
 
