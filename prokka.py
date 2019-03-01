@@ -41,9 +41,9 @@ def run_prokka(fasta_file, output_dir, prefix_name):
                                                                                     prefix_name, \
                                                                                     fasta_file)
     args = shlex.split(prokka_cmd)
-    print(args)
-    # prokka_run = subprocess.Popen(args, stdout=subprocess.PIPE, \
-    #                             stderr=subprocess.PIPE, universal_newlines=True)
+
+    subprocess.run(args, stdout=subprocess.PIPE, \
+                                stderr=subprocess.PIPE, universal_newlines=True)
     #
     # prokka_communicate = prokka_run.communicate()
     #
@@ -158,13 +158,13 @@ def main():
 
     run_prokka(fasta_file, output_dir, prefix_name)
 
-    # count = cds_trna_difference(prokka_file, refseq_file)
-    #
-    # write_output_tmp(count, assembly_name)
-    #
-    # copy_prokka_text('tmp', 'UPEC')
-    #
-    # copy_prokka_text(prokka_file, 'UPEC')
+    count = cds_trna_difference(prokka_file, refseq_file)
+
+    write_output_tmp(count, assembly_name)
+
+    copy_prokka_text('tmp', 'UPEC')
+
+    copy_prokka_text(prokka_file, 'UPEC')
 
 
 if __name__ == '__main__':
