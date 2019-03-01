@@ -3,82 +3,138 @@
 This is a mini project at graduate level to analyze four strains of Escherichia Coli from an RNA-seq experiment and
 compare their gene expression data against the RefSeq genomes from NCBI.
 
-## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+## Software Dependencies/Requirements
+* **Linux/Unix**
+* **[Python 3+](https://www.python.org/downloads/)**
+    * Developed using 3.6.7, requires 3.5+ due to subprocess python module
+* **[Biopython](https://biopython.org/) 1.73**
+* **[Prokka](https://github.com/tseemann/prokka) 1.13.3**
+* **[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.3.4.1**
+* **[Tophat2](https://ccb.jhu.edu/software/tophat/index.shtml) 2.1.1**
+* **[Samtools](http://samtools.sourceforge.net/) 1.7**
+* **[Cufflinks](https://cole-trapnell-lab.github.io/cufflinks/) 2.2.1**
+* **[Cuffmerge](https://cole-trapnell-lab.github.io/cufflinks/) 1.0.0**
+* **[Cuffnorm](https://cole-trapnell-lab.github.io/cufflinks/) 2.2.1**
 
-### Prerequisites
+## Installing and Input Format
 
-SRA Input File:
+### Installing
+
+To run this wrapper, open a terminal session and clone the repository with the command below into a directory of your choosing.
+```
+git clone https://github.com/tbeaux18/comp483_miniproject.git
+```
+
+### Input Files and Format
+Text files are only accepted, and must be constructed exactly to specification. Below are examples of the two files required and their structure.
+*file containing FTP links that include both the gunzipped FASTA and FEATURE*
+*file containing SRA accession IDs*
+
+**SRA Input File**:
 The format is very important since the parsers need this exact format and there is no error handling around this.
 ```
 <Strain_name>,<SRA_Accession_ID>
 ```
-
-Example:
+**Example**:
 ```
-HM27,SRR1278956
+HM27,SRR1278956\n
 ```
 
-FTP Input File:
+**FTP Input File**:
 The format is very important since the parsers need this exact format and there is no error handling around this.
 ```
 <Strain_name>,<FTP link for fasta .fna.gz>,<FTP link for feature file .txt.gz>\n
 ```
-
-Example:
+**Example**:
 ```
 HM27,ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_genomic.fna.gz,ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM38782v2/GCF_000387825.2_ASM38782v2_feature_count.txt.gz
 ```
 
+## Main Application Arguments
+* `-p/--ftp_links` _Specify .bed, .bim and .fam._ [Example](http://zzz.bwh.harvard.edu/plink/data.shtml#bed)
+* `-s/--sra_file` _Merge in a binary fileset._ [Example](http://zzz.bwh.harvard.edu/plink/dataman.shtml#bmerge)
+* `-t/--threads` _Make .bed, .fam and .bim. **(ON HOLD)**_ [Example](http://zzz.bwh.harvard.edu/plink/data.shtml#bed)
 
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
+To run the wrapper, clone the repository as described in Installing section and run the wrapper command as below:
+**Example**
 ```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+python3 run_wrapper.py -p <path/to/ftpfile.txt> -s <path/to/sra_file.txt> -t 10
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+To make an executable, run
+```
+chmod a+x run_wrapper.py
+```
+and then you can run the wrapper as so:
+```
+./run_wrapper.py -p <path/to/ftpfile.txt> -s <path/to/sra_file.txt> -t 10
+```
 
-## Running the tests
+### Scripts
+* `run_wrapper.py`
+  * Executed from the top level directory, calls the various scripts below and runs them in linear order.
+* `parse_fasta.py`
+  * Executed from the scripts directory, one level below the top level directory.
+  * Takes the FTP links, downloads the FTP files and parses the FASTA file and outputs to UPEC.log.
+* `prokka.py`
+  * Executed from the scripts directory, one level below the top level directory.
+  * Runs the prokka software with set arguments, and parses the output file and includes them in the UPEC.log.
+  * These output files are required for downstream analysis.
+* `fastq_dump.py`
+  * Executed from the scripts directory, one level below the top level directory.
+  * Takes the supplied SRA file and begins to fetch the SRA files and puts them in the *$HOME/ncbi/public/sra* directory on the respective machine. **DO NOT MOVE**
+  * fastq_dump is executed and looks for the SRA files in the *$HOME/ncbi/public/sra* directory.
+* `tophat2.py`
+  * Executed from the scripts directory, one level below the top level directory.
+  * Begins with using bowtie2 to construct index files from the FASTA files downloaded. The index files reside in the working directory of where this script is executed.
+  * Each alignment takes roughly 2-4 hours depending on the number of threads specified.
+* `cufflinks.py`
+  * Executed from the scripts directory, one level below the top level directory.
+  * Runs the cufflinks, cuffmerge and cuff norm software, and relies on the gtf files produced from prokka.
+  * **cuffnorm will fail, there is a sorting error that is unresolved**
+
 
 Explain how to run the automated tests for this system
 
-### Break down into end to end tests
+## Running the wrapper
 
-Explain what these tests test and why
+After cloning the repository, run the `run_wrapper.py` command with the arguments as specified above under **Main Application Arguments**
 
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+The following file tree will be present in the directory during and after running.
+  * README.md
+  * run_wrapper.py
+  * ./test_data
+    * ftp_input.txt
+    * sra_files.txt
+  * ./Timothy_Baker
+    * assemblies.txt
+    * ftp_links.txt
+    * sra_files.txt
+    * UPEC.log
+    * ./<name>_prokout
+      * <name>_index.gff
+    * ./<name>_sra
+      * <SRA Accession>_1.fastq
+      * <SRA Accession>__2.fastq
+    * ./<name>_tophat
+      * accepted_hits.bam
+    * ./<name>_cuff
+      * transcripts.gtf
+    * ./ncbi_fasta
+      * <name>_FASTA.fna
+      * <name>_FEAT.fna
+    * <name>_index.bt2
+    * <name>.fa
+    * ./merged_ecoli
+      * merged.gtf
+  * ./scripts
+    * cufflinks.py
+    * fastq_dump.py
+    * parse_fasta.py
+    * prokka.py
+    * tophat2.py
+  * working.log
 
 ## Authors
 
