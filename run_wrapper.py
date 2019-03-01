@@ -7,7 +7,6 @@
 import os
 import argparse
 import subprocess
-import shutil
 
 
 CURRENT_DIR = os.getcwd()
@@ -33,14 +32,12 @@ def arg_parser():
 
 
 def main():
-    print(CURRENT_DIR)
     args = arg_parser()
 
     threads = args.threads
     ftp_files = args.ftp_links
     sra_file = args.sra_file
 
-    # shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
 
     ftp_path = CURRENT_DIR + '/' + ftp_files
     sra_path = CURRENT_DIR + '/' + sra_file
@@ -70,22 +67,21 @@ def main():
 
     with open(ftp_files, 'r') as ftp_input:
         assembly_name_list = [line.strip().split(',')[0] for line in ftp_input]
-
+        nargs_assembly = '\t'.join(assembly_name_list)
 
     parse_fasta_cmd = "python3 parse_fasta.py -f {}".format(ftp_files)
     subprocess.run(parse_fasta_cmd, shell=True)
 
-    prokka_cmd = "python3 prokka.py -a {}".format(assembly_name_list)
+    prokka_cmd = "python3 prokka.py -n {}".format(nargs_assembly)
     subprocess.run(prokka_cmd, shell=True)
 
     fastq_dump_cmd = "python3 fastq_dump.py -s {}".format(sra_file)
     subprocess.run(fastq_dump_cmd, shell=True)
 
-    tophat2_cmd = "python3 tophat2.py -a {} -s {} -t {}".format(assembly_name_list, \
-                                                                sra_file, threads)
+    tophat2_cmd = "python3 tophat2.py -s {} -t {}".format(sra_file, threads)
     subprocess.run(tophat2_cmd, shell=True)
 
-    cufflinks_cmd = "python3 cufflinks.py -a {} -t {}".format(assembly_name_list, threads)
+    cufflinks_cmd = "python3 cufflinks.py -n {} -t {}".format(nargs_assembly, threads)
     subprocess.run(cufflinks_cmd, shell=True)
 
 
