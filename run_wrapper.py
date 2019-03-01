@@ -68,8 +68,8 @@ def main():
 
     ftp_path = CURRENT_DIR + '/' + ftp_files
     sra_path = CURRENT_DIR + '/' + sra_file
-    ftp_to_path = CURRENT_DIR + '/Timothy_Baker' + ftp_files
-    sra_to_path = CURRENT_DIR + '/Timothy_Baker' + sra_file
+    ftp_to_path = CURRENT_DIR + '/Timothy_Baker/' + ftp_files
+    sra_to_path = CURRENT_DIR + '/Timothy_Baker/' + sra_file
 
     LOGGER.info("Moving input files into new directory.")
     os.rename(ftp_path, ftp_to_path)
