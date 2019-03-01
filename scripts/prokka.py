@@ -192,8 +192,9 @@ def main():
     args = arg_parser()
 
     # assembly must be in list format
-    assembly_nargs = args.nargs
+    assembly_nargs = list(args.nargs)
 
+    print(assembly_nargs)
     # runs the build; no error handling available
     build_prokka_run(assembly_nargs)
 
