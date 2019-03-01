@@ -56,8 +56,8 @@ def main():
     # tophat2_to_path = CURRENT_DIR + '/Timothy_Baker_tests/tophat2.py'
     # cufflinks_to_path = CURRENT_DIR + '/Timothy_Baker_tests/cufflinks.py'
     #
-    # os.rename(ftp_path, ftp_to_path)
-    # os.rename(sra_path, sra_to_path)
+    os.rename(ftp_path, ftp_to_path)
+    os.rename(sra_path, sra_to_path)
     # os.rename(parse_fasta_path, parse_fasta_to_path)
     # os.rename(fastq_dump_path, fastq_dump_to_path)
     # os.rename(prokka_path, prokka_to_path)
