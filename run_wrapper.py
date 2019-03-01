@@ -10,7 +10,7 @@ import subprocess
 
 
 FIRST_LAST_PATH = './Timothy_Baker_test'
-if os.path.isdir('./Timothy_Baker_test'):
+if os.path.isdir('./Timothy_Baker_tests'):
     os.chdir(FIRST_LAST_PATH)
 else:
     os.mkdir(FIRST_LAST_PATH)
@@ -38,6 +38,8 @@ def main():
     ftp_files = args.ftp_links
     sra_file = args.sra_file
 
+    os.rename(ftp_files, FIRST_LAST_PATH + '/' + ftp_files)
+    os.rename(sra_file, FIRST_LAST_PATH + '/' + sra_file)
 
     with open(ftp_files, 'r') as ftp_input:
         assembly_name_list = [line.strip().split(',')[0] for line in ftp_input]
