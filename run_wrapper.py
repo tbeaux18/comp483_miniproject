@@ -72,11 +72,11 @@ def main():
     parse_fasta_cmd = "python3 parse_fasta.py -f {}".format(ftp_files)
     subprocess.run(parse_fasta_cmd, shell=True)
 
-    prokka_cmd = "python3 prokka.py -n {}".format(nargs_assembly)
-    subprocess.run(prokka_cmd, shell=True)
+    # prokka_cmd = "python3 prokka.py -n {}".format(nargs_assembly)
+    # subprocess.run(prokka_cmd, shell=True)
 
-    fastq_dump_cmd = "python3 fastq_dump.py -s {}".format(sra_file)
-    subprocess.run(fastq_dump_cmd, shell=True)
+    # fastq_dump_cmd = "python3 fastq_dump.py -s {}".format(sra_file)
+    # subprocess.run(fastq_dump_cmd, shell=True)
 
     tophat2_cmd = "python3 tophat2.py -s {} -t {}".format(sra_file, threads)
     subprocess.run(tophat2_cmd, shell=True)
