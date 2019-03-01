@@ -86,6 +86,11 @@ HM46_FASTA = './ncbi_fasta/HM46_FASTA.fna'
 HM65_FASTA = './ncbi_fasta/HM65_FASTA.fna'
 HM69_FASTA = './ncbi_fasta/HM69_FASTA.fna'
 
+HM27_FEATURE = './ncbi_fasta/hm27_feature.txt'
+HM46_FEATURE = './ncbi_fasta/hm46_feature.txt'
+HM65_FEATURE = './ncbi_fasta/hm65_feature.txt'
+HM69_FEATURE = './ncbi_fasta/hm69_feature.txt'
+
 HM27_GFF_FILE = './prokka_hm27/hm27_index.gff'
 HM46_GFF_FILE = './prokka_hm46/hm46_index.gff'
 HM65_GFF_FILE = './prokka_hm65/hm65_index.gff'
@@ -395,17 +400,6 @@ def build_tophat_alignment(fasta_file_list, fastq_tuple_list, bam_file_list, sor
 
         LOGGER.info("Alignment Complete")
 
-
-    # print("Sorting BAM files.")
-    # LOGGER.info("Beginning bam file sorting.")
-    # for bam_file, sorted_out_bam in zip(bam_file_list, sorted_bam_list):
-    #
-    #     LOGGER.info("Sorting {}".format(bam_file))
-    #
-    #     sort_bam_command = "samtools sort {} -o {}".format(bam_file, sorted_out_bam)
-    #     subprocess.run(sort_bam_command, shell=True)
-    #
-    #     LOGGER.info("Finished sorting {}".format(sorted_out_bam))
 
 
 
