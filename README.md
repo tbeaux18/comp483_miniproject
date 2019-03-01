@@ -52,9 +52,9 @@ HM27,ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM3
 ```
 
 ## Main Application Arguments
-* `-p/--ftp_links` _Specify .bed, .bim and .fam._ [Example](http://zzz.bwh.harvard.edu/plink/data.shtml#bed)
-* `-s/--sra_file` _Merge in a binary fileset._ [Example](http://zzz.bwh.harvard.edu/plink/dataman.shtml#bmerge)
-* `-t/--threads` _Make .bed, .fam and .bim. **(ON HOLD)**_ [Example](http://zzz.bwh.harvard.edu/plink/data.shtml#bed)
+* `-p/--ftp_links` _text file_
+* `-s/--sra_file` _text file_
+* `-t/--threads` _integer_
 
 To run the wrapper, clone the repository as described in Installing section and run the wrapper command as below:
 
@@ -102,7 +102,7 @@ After cloning the repository, run the `run_wrapper.py` command with the argument
 
 Pipeline will take roughly 12-24 hours in total to run depending on threading.
 
-Place the 2 input files in the same direcotry as the `run_wrapper.py` script.
+Place the 2 input files in the same directory as the `run_wrapper.py` script.
 
 The following file tree will be present in the directory during and after running.
   * README.md
