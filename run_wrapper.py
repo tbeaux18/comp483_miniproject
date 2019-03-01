@@ -10,7 +10,7 @@ import subprocess
 import shutil
 
 
-CURRENT_DIR = os.getcwd
+CURRENT_DIR = os.getcwd()
 
 if os.path.isdir('./Timothy_Baker_tests'):
     os.chdir('./Timothy_Baker_tests')
@@ -42,9 +42,11 @@ def main():
 
     # shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
 
+    ftp_path = CURRENT_DIR + '/' + ftp_files
+    sra_path = CURRENT_DIR + '/' + sra_file
 
-    os.rename(CURRENT_DIR + '/' + ftp_files, './Timothy_Baker_tests/' + ftp_files)
-    os.rename(CURRENT_DIR + '/' + sra_file, './Timothy_Baker_tests/' + sra_file)
+    os.rename(ftp_path, './Timothy_Baker_tests/' + ftp_files)
+    os.rename(sra_path, './Timothy_Baker_tests/' + sra_file)
 
 
     with open(ftp_files, 'r') as ftp_input:
