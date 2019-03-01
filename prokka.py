@@ -17,7 +17,6 @@ run_prokka.py
 
 
 import argparse
-import shlex
 import subprocess
 
 
@@ -57,14 +56,8 @@ def copy_prokka_text(prefix_name, log_file_name):
 
     copy_cmd = "cat {}.txt >> {}.log".format(prefix_name, log_file_name)
 
-    args = shlex.split(copy_cmd)
+    subprocess.run(copy_cmd, shell=True)
 
-    copy_process = subprocess.Popen(args, stdout=subprocess.PIPE, \
-                            stderr=subprocess.PIPE, universal_newlines=True)
-
-    copy_process = copy_process.communicate()
-
-    return copy_process
 
 
 def grep_count(word, input_file):
@@ -176,6 +169,7 @@ def build_prokka_run(assembly_name_list):
         prefix_name = assembly_name + '_index'
         output_dir = assembly_name + '_prokout'
         prokka_file = './' + output_dir + '/' + prefix_name + '.gff'
+        prokka_text = './' + output_dir + '/' + prefix_name + '.txt'
         refseq_file = './ncbi_fasta/' + assembly_name + '_FEAT.fna'
 
         run_prokka(fasta_file, prefix_name, output_dir)
@@ -184,7 +178,10 @@ def build_prokka_run(assembly_name_list):
 
         write_output_tmp(list(count), assembly_name)
 
-        copy_prokka_text(prokka_file, 'UPEC')
+        with open(prokka_text, 'r') as input_file:
+            with open('UPEC.log', 'a') as output_file:
+                for line in input_file:
+                    output_file.write(line + '\n')
 
 def main():
     """ runs mains script """
