@@ -77,7 +77,6 @@ else:
     os.mkdir(FIRST_LAST_PATH)
     os.chdir(FIRST_LAST_PATH)
 
-CURRENT_DIR = os.getcwd()
 
 FASTA_DIR_PATH = './ncbi_fasta'
 
@@ -269,7 +268,96 @@ def build_prokka(fasta_list, log_file):
         #     for line in txt_file:
         #         log_file.write(str(line))
 
+def copy_prokka_text(prefix_name, log_file_name):
 
+    copy_cmd = "cat {}.txt >> {}.log".format(prefix_name, log_file_name)
+
+    args = shlex.split(copy_cmd)
+
+    copy_process = subprocess.Popen(args, stdout=subprocess.PIPE, \
+                            stderr=subprocess.PIPE, universal_newlines=True)
+
+    copy_process = copy_process.communicate()
+
+    return copy_process
+
+
+def grep_count(word, input_file):
+    """ takes a word, and an input file and returns the count using grep
+        Args:
+            word (str) : string
+            input_file (file) : any input to grep
+        Return
+            integer object count of one word
+
+     """
+
+    grep_process = subprocess.Popen(["grep", "-c", word, input_file], \
+                                                    stdout=subprocess.PIPE, \
+                                                    stderr=subprocess.PIPE, \
+                                                    universal_newlines=True)
+
+    word_count = grep_process.communicate()
+
+    if word_count:
+        return int(word_count[0].strip())
+
+    return None
+
+
+def cds_trna_difference(prokka_file, refseq_file):
+
+    prokka_dict_count = {'\tCDS\t':0, '\ttRNA\t':0}
+    refseq_dict_count = {'\tCDS\t':0, '\ttRNA\t':0}
+
+    for key in prokka_dict_count:
+        count = grep_count(key, prokka_file)
+        prokka_dict_count[key] = int(count)
+
+    with open(refseq_file, 'r') as refseq:
+        for line in refseq:
+            new_line = line.strip().split('\t')
+
+            if new_line[0] == 'CDS' and new_line[1] == 'with_protein':
+                refseq_dict_count['\tCDS\t'] = int(new_line[5])
+
+            if new_line[0] == 'tRNA':
+                refseq_dict_count['\ttRNA\t'] = int(new_line[6])
+
+    result_dict = {}
+
+    for key, value in refseq_dict_count.items():
+        result = prokka_dict_count[key] - value
+        result_dict[key] = result
+
+    return result_dict.values()
+
+
+def write_output_tmp(count, name):
+
+    with open('tmp.txt', 'w') as tmp_file:
+
+        if count[0] < 0 and count[1] == 0:
+            tmp_file.write("Prokka found {} less CDS and the same amount of tRNA than the Refseq in assembly {}".format(count[0], name))
+        elif count[0] > 0 and count[1] == 0:
+            tmp_file.write("Prokka found {} additional CDS and the same amount of tRNA than the Refseq in assembly {}".format(count[0], name))
+
+        elif count[0] == 0 and count[1] < 0:
+            tmp_file.write("Prokka found the same amount of CDS and {} less tRNA than the Refseq in assembly {}".format(count[1], name))
+        elif count[0] == 0 and count[1] > 0:
+            tmp_file.write("Prokka found the same amount of CDS and {} additional tRNA than the Refseq in assembly {}".format(count[1], name))
+
+        elif count[0] > 0 and count[1] > 0:
+            tmp_file.write("Prokka found {} additional CDS and {} additional tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+        elif count[0] < 0 and count[1] < 0:
+            tmp_file.write("Prokka found {} less CDS and {} less tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+
+        elif count[0] > 0 and count[1] < 0:
+            tmp_file.write("Prokka found {} additional CDS and {} less tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+        elif count[0] < 0 and count[1] > 0:
+            tmp_file.write("Prokka found {} less CDS and {} additional tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+
+    return None
 
 
  #   _____ _____         _______ ____   ____  _       _____

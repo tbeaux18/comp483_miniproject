@@ -49,13 +49,10 @@ def prefetch_fastq_decomp(sra_accesion, fastq_dir):
 
 def main():
     """ running fastq dump script """
-    
+
     args = arg_parser()
 
-    assembly_name = args.assembly_name
     sra_accesion = args.sra_file
-
-    fastq_dir = assembly_name + '_sra'
 
     with open(sra_accesion, 'r') as sra_input:
         for line in sra_input:
