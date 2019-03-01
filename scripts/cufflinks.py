@@ -118,7 +118,7 @@ def build_bam_list(assembly_nargs):
 
     return '\t'.join(bam_list)
 
-
+ls -
 def main():
     """ runs main script """
 
@@ -126,7 +126,7 @@ def main():
     args = arg_parser()
 
     # sets arguments
-    assembly_nargs = args.nargs
+    assembly_nargs = list(args.nargs)
     threads = args.threads
 
     # runs the build with the nargs
