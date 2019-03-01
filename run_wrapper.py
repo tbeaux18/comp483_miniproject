@@ -81,23 +81,23 @@ def main():
         LOGGER.info("The assembly names are %s", str(nargs_assembly))
 
     LOGGER.info("Downloading FASTA and Feature files from NCBI.")
-    parse_fasta_cmd = "python3 ../parse_fasta.py -f {}".format(ftp_files)
+    parse_fasta_cmd = "python3 ../scripts/parse_fasta.py -f {}".format(ftp_files)
     subprocess.run(parse_fasta_cmd, shell=True)
 
     LOGGER.info("Running prokkaself.")
-    prokka_cmd = "python3 ../prokka.py -n {}".format(nargs_assembly)
+    prokka_cmd = "python3 ../scripts/prokka.py -n {}".format(nargs_assembly)
     subprocess.run(prokka_cmd, shell=True)
 
     LOGGER.info("Downloading SRA files and decompressing to FASTQ")
-    # fastq_dump_cmd = "python3 ../fastq_dump.py -s {}".format(sra_file)
+    # fastq_dump_cmd = "python3 ../scripts/fastq_dump.py -s {}".format(sra_file)
     # subprocess.run(fastq_dump_cmd, shell=True)
 
     # LOGGER.info("Building bowtie2 index and running Tophat2 alignment.")
-    # tophat2_cmd = "python3 ../tophat2.py -s {} -t {}".format(sra_file, threads)
+    # tophat2_cmd = "python3 ../scripts/tophat2.py -s {} -t {}".format(sra_file, threads)
     # subprocess.run(tophat2_cmd, shell=True)
 
     LOGGER.info("Assembling transcripts, merging, and normalization.")
-    cufflinks_cmd = "python3 ../cufflinks.py -n {} -t {}".format(nargs_assembly, threads)
+    cufflinks_cmd = "python3 ../scripts/cufflinks.py -n {} -t {}".format(nargs_assembly, threads)
     subprocess.run(cufflinks_cmd, shell=True)
 
     LOGGER.info("Pipeline complete.")
