@@ -57,6 +57,7 @@ HM27,ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/387/825/GCF_000387825.2_ASM3
 * `-t/--threads` _Make .bed, .fam and .bim. **(ON HOLD)**_ [Example](http://zzz.bwh.harvard.edu/plink/data.shtml#bed)
 
 To run the wrapper, clone the repository as described in Installing section and run the wrapper command as below:
+
 **Example**
 ```
 python3 run_wrapper.py -p <path/to/ftpfile.txt> -s <path/to/sra_file.txt> -t 10
@@ -95,14 +96,18 @@ and then you can run the wrapper as so:
   * **cuffnorm will fail, there is a sorting error that is unresolved**
 
 
-Explain how to run the automated tests for this system
-
 ## Running the wrapper
 
-After cloning the repository, run the `run_wrapper.py` command with the arguments as specified above under **Main Application Arguments**
+After cloning the repository, run the `run_wrapper.py` command with the arguments as specified above under **Main Application Arguments**.
+
+Pipeline will take roughly 12-24 hours in total to run depending on threading.
+
+Place the 2 input files in the same direcotry as the `run_wrapper.py` script.
 
 The following file tree will be present in the directory during and after running.
   * README.md
+  * USER_DESIGNATED_FTP_INPUT_FILE.TXT
+  * USER_DESIGNATED_SRA_INPUT_FILE.TXT
   * run_wrapper.py
   * ./test_data
     * ftp_input.txt
@@ -112,28 +117,27 @@ The following file tree will be present in the directory during and after runnin
     * ftp_links.txt
     * sra_files.txt
     * UPEC.log
-    * ./<name>_prokout
-      * <name>_index.gff
-    * ./<name>_sra
-      * <SRA Accession>_1.fastq
-      * <SRA Accession>__2.fastq
-    * ./<name>_tophat
+    * ./name_prokout
+      * name_index.gff
+    * ./name_sra
+      * SRAname_1.fastq
+      * SRAname_2.fastq
+    * ./name_tophat
       * accepted_hits.bam
-    * ./<name>_cuff
+    * ./name_cuff
       * transcripts.gtf
     * ./ncbi_fasta
-      * <name>_FASTA.fna
-      * <name>_FEAT.fna
-    * <name>_index.bt2
-    * <name>.fa
+      * name_FASTA.fna
+      * name_FEAT.fna
+    * name_index.bt2
+    * name.fa
     * ./merged_ecoli
       * merged.gtf
-  * ./scripts
-    * cufflinks.py
-    * fastq_dump.py
-    * parse_fasta.py
-    * prokka.py
-    * tophat2.py
+  * cufflinks.py
+  * fastq_dump.py
+  * parse_fasta.py
+  * prokka.py
+  * tophat2.py
   * working.log
 
 ## Authors

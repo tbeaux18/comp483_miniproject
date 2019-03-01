@@ -85,7 +85,7 @@ def grep_count(word, input_file):
     word_count = grep_process.communicate()
 
     if word_count:
-        return int(word_count[0].strip())
+        return word_count[0].strip()
 
     return None
 
@@ -104,7 +104,10 @@ def cds_trna_difference(prokka_file, refseq_file):
 
     for key in prokka_dict_count:
         count = grep_count(key, prokka_file)
-        prokka_dict_count[key] = int(count)
+        try:
+            prokka_dict_count[key] = int(count)
+        except ValueError:
+            pass
 
     with open(refseq_file, 'r') as refseq:
         for line in refseq:
@@ -134,27 +137,27 @@ def write_output_tmp(count, name):
             None
     """
 
-    with open('tmp.txt', 'w') as tmp_file:
+    with open('UPEC.log', 'a') as tmp_file:
 
         if count[0] < 0 and count[1] == 0:
-            tmp_file.write("Prokka found {} less CDS and the same amount of tRNA than the Refseq in assembly {}".format(count[0], name))
+            tmp_file.write("\nProkka found {} less CDS and the same amount of tRNA than the Refseq in assembly {}".format(count[0], name))
         elif count[0] > 0 and count[1] == 0:
-            tmp_file.write("Prokka found {} additional CDS and the same amount of tRNA than the Refseq in assembly {}".format(count[0], name))
+            tmp_file.write("\nProkka found {} additional CDS and the same amount of tRNA than the Refseq in assembly {}".format(count[0], name))
 
         elif count[0] == 0 and count[1] < 0:
-            tmp_file.write("Prokka found the same amount of CDS and {} less tRNA than the Refseq in assembly {}".format(count[1], name))
+            tmp_file.write("\nProkka found the same amount of CDS and {} less tRNA than the Refseq in assembly {}".format(count[1], name))
         elif count[0] == 0 and count[1] > 0:
-            tmp_file.write("Prokka found the same amount of CDS and {} additional tRNA than the Refseq in assembly {}".format(count[1], name))
+            tmp_file.write("\nProkka found the same amount of CDS and {} additional tRNA than the Refseq in assembly {}".format(count[1], name))
 
         elif count[0] > 0 and count[1] > 0:
-            tmp_file.write("Prokka found {} additional CDS and {} additional tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+            tmp_file.write("\nProkka found {} additional CDS and {} additional tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
         elif count[0] < 0 and count[1] < 0:
-            tmp_file.write("Prokka found {} less CDS and {} less tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+            tmp_file.write("\nProkka found {} less CDS and {} less tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
 
         elif count[0] > 0 and count[1] < 0:
-            tmp_file.write("Prokka found {} additional CDS and {} less tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+            tmp_file.write("\nProkka found {} additional CDS and {} less tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
         elif count[0] < 0 and count[1] > 0:
-            tmp_file.write("Prokka found {} less CDS and {} additional tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
+            tmp_file.write("\nProkka found {} less CDS and {} additional tRNA than the Refseq in assembly {}".format(count[0], count[1], name))
 
     return None
 
@@ -179,9 +182,7 @@ def build_prokka_run(assembly_name_list):
 
         count = cds_trna_difference(prokka_file, refseq_file)
 
-        write_output_tmp(count, assembly_name)
-
-        copy_prokka_text('tmp', 'UPEC')
+        write_output_tmp(list(count), assembly_name)
 
         copy_prokka_text(prokka_file, 'UPEC')
 
@@ -194,7 +195,7 @@ def main():
     # assembly must be in list format
     assembly_nargs = list(args.nargs)
 
-    print(assembly_nargs)
+
     # runs the build; no error handling available
     build_prokka_run(assembly_nargs)
 
