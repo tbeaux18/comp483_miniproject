@@ -18,7 +18,6 @@ def arg_parser():
         description='RNA-seq python wrapper for 4 E.Coli genomes.\n'
     )
     parser.add_argument('-s', '--sra_file', help='sra accession id')
-
     return parser.parse_args()
 
 
@@ -42,6 +41,8 @@ def prefetch_fastq_decomp(sra_accesion, fastq_dir):
     subprocess.run(['prefetch', sra_accesion])
 
     fq_command = "fastq-dump -I --split-files {} -O {}".format(sra_accesion, fastq_dir)
+
+    print("Decompressing FASTQ for {}".format(sra_accesion))
 
     subprocess.run(fq_command, shell=True)
 
