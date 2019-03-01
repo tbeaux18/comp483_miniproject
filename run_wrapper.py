@@ -39,8 +39,8 @@ def main():
     ftp_files = args.ftp_links
     sra_file = args.sra_file
 
-    os.rename(CURRENT_DIR + ftp_files, './Timothy_Baker_tests/' + ftp_files)
-    os.rename(CURRENT_DIR + sra_file, './Timothy_Baker_tests/' + sra_file)
+    os.rename(str(CURRENT_DIR) + ftp_files, './Timothy_Baker_tests/' + ftp_files)
+    os.rename(str(CURRENT_DIR) + sra_file, './Timothy_Baker_tests/' + sra_file)
 
     with open(ftp_files, 'r') as ftp_input:
         assembly_name_list = [line.strip().split(',')[0] for line in ftp_input]
