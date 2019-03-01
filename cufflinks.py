@@ -2,9 +2,8 @@
 """
 @author: Timothy Baker
 @version: 1.0.0
+
 cufflinks.py
-
-
 
 """
 
@@ -118,7 +117,7 @@ def build_bam_list(assembly_nargs):
 
     return '\t'.join(bam_list)
 
-ls -
+
 def main():
     """ runs main script """
 

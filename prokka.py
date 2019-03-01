@@ -195,7 +195,6 @@ def main():
     # assembly must be in list format
     assembly_nargs = list(args.nargs)
 
-
     # runs the build; no error handling available
     build_prokka_run(assembly_nargs)
 
