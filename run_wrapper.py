@@ -40,7 +40,7 @@ def main():
     ftp_files = args.ftp_links
     sra_file = args.sra_file
 
-    shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
+    # shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
 
 
     os.rename(CURRENT_DIR + '/' + ftp_files, './Timothy_Baker_tests/' + ftp_files)
