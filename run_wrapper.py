@@ -4,10 +4,18 @@
 @version: 1.0.0
 
 """
-
 import os
 import argparse
 import subprocess
+
+
+FIRST_LAST_PATH = './Timothy_Baker_test'
+if os.path.isdir('./Timothy_Baker_test'):
+    os.chdir(FIRST_LAST_PATH)
+else:
+    os.mkdir(FIRST_LAST_PATH)
+    os.chdir(FIRST_LAST_PATH)
+
 
 def arg_parser():
     """ Argument input from command line """
